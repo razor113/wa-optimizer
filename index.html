@@ -13,22 +13,22 @@
         .option-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(51, 65, 85, 0.6); }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-3 sm:p-6">
+<body class="min-h-screen py-6 px-3 sm:px-6 flex justify-center items-start">
 
-    <div class="glass max-w-lg w-full rounded-2xl p-5 sm:p-6 shadow-2xl">
+    <div class="glass max-w-lg w-full rounded-2xl p-5 shadow-2xl my-auto">
         <!-- Header -->
         <div class="flex items-center justify-between mb-2">
             <div class="flex items-center space-x-3">
                 <div class="w-2.5 h-7 bg-emerald-500 rounded-full"></div>
-                <h1 class="text-xl sm:text-2xl font-bold text-white tracking-wide">WA Studio Optimizer</h1>
+                <h1 class="text-xl font-bold text-white tracking-wide">WA Studio Optimizer</h1>
             </div>
-            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">Pro v2.0</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">Pro v2.1</span>
         </div>
-        <p class="text-xs text-slate-400 mb-5">WhatsApp Quality නොබැස Video Optimize, Split සහ Edit කරන All-in-One ටූල් එක.</p>
+        <p class="text-xs text-slate-400 mb-4">WhatsApp Quality නොබැස Video Optimize, Split සහ Edit කරන All-in-One ටූල් එක.</p>
 
         <!-- 1. File Upload -->
         <div class="mb-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">1. ප්‍රධාන Video එක තෝරන්න</label>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">1. ප්‍රධාන Video එක තෝරන්න</label>
             <input type="file" id="uploader" accept="video/*" class="block w-full text-sm text-slate-300
                 file:mr-3 file:py-2 file:px-4
                 file:rounded-xl file:border-0
@@ -39,66 +39,88 @@
 
         <!-- 2. Target Mode -->
         <div class="mb-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">2. Quality Mode එක</label>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">2. Quality Mode එක</label>
             <div class="grid grid-cols-2 gap-2.5">
                 <label class="cursor-pointer">
                     <input type="radio" name="mode" value="status" class="peer sr-only" checked>
-                    <div class="p-3 rounded-xl border border-slate-700/80 bg-slate-900/40 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition text-center">
+                    <div class="p-2.5 rounded-xl border border-slate-700/80 bg-slate-900/40 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition text-center">
                         <div class="font-bold text-sm text-white">Status Mode</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">720p • 30fps • 2.2 Mbps</div>
+                        <div class="text-[11px] text-slate-400">720p • 30fps • 2.2 Mbps</div>
                     </div>
                 </label>
                 <label class="cursor-pointer">
                     <input type="radio" name="mode" value="chat" class="peer sr-only">
-                    <div class="p-3 rounded-xl border border-slate-700/80 bg-slate-900/40 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition text-center">
+                    <div class="p-2.5 rounded-xl border border-slate-700/80 bg-slate-900/40 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition text-center">
                         <div class="font-bold text-sm text-white">Chat HD Mode</div>
-                        <div class="text-[11px] text-slate-400 mt-0.5">1080p • 30fps • 4.5 Mbps</div>
+                        <div class="text-[11px] text-slate-400">1080p • 30fps • 4.5 Mbps</div>
                     </div>
                 </label>
             </div>
         </div>
 
+        <!-- START BUTTON (Moved up so it is always visible!) -->
+        <button id="convertBtn" class="w-full mb-5 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl transition duration-200 shadow-lg shadow-emerald-900/40 disabled:opacity-50">
+            🚀 Start Optimize & Send to WhatsApp
+        </button>
+
+        <!-- Progress Bar Section -->
+        <div id="statusBox" class="mb-5 hidden bg-slate-900/90 p-4 rounded-xl border border-emerald-500/30">
+            <div class="flex justify-between text-xs text-slate-300 mb-2">
+                <span id="statusText">Engine එක Load වෙමින් පවතී...</span>
+                <span id="progressPercent" class="font-mono text-emerald-400">0%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
+                <div id="progressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-2 text-center">වැඩේ අවසන් වන තුරු Browser එක Close කරන්න එපා.</p>
+        </div>
+
+        <!-- Output & Multi-Part Results Section -->
+        <div id="resultBox" class="mb-5 hidden border border-emerald-500/30 bg-slate-900/60 p-4 rounded-xl">
+            <div class="flex items-center justify-between mb-3">
+                <span class="text-sm font-semibold text-emerald-400">✓ සාර්ථකව Optimize වුණා!</span>
+                <span id="partsCountBadge" class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700"></span>
+            </div>
+            <div id="partsContainer" class="space-y-4"></div>
+        </div>
+
         <!-- 3. Studio Features Grid -->
-        <div class="mb-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">3. Studio Effects & Tools</label>
+        <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">3. Studio Effects & Tools (අවශ්‍ය නම් වෙනස් කරන්න)</label>
             
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-2.5">
-                <!-- Auto Sharpen -->
+            <div class="space-y-2.5 mb-2.5">
                 <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
                     <div>
                         <div class="text-xs font-semibold text-slate-200">Auto Sharpen</div>
-                        <div class="text-[10px] text-slate-400">බොඳවීම නැති කරයි</div>
+                        <div class="text-[10px] text-slate-400">WhatsApp බොඳවීම නැති කරයි</div>
                     </div>
                     <input type="checkbox" id="sharpen" checked class="w-4 h-4 accent-emerald-500 rounded">
                 </label>
 
-                <!-- 30s Status Splitter -->
                 <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
                     <div>
                         <div class="text-xs font-semibold text-emerald-300">30s Status Split</div>
-                        <div class="text-[10px] text-slate-400">තත්පර 30න් 30ට කපයි</div>
+                        <div class="text-[10px] text-slate-400">දිග වීඩියෝ තත්පර 30න් 30ට කපයි</div>
                     </div>
                     <input type="checkbox" id="split30" class="w-4 h-4 accent-emerald-500 rounded">
                 </label>
 
-                <!-- 9:16 Blur Background -->
-                <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer sm:col-span-2">
+                <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
                     <div>
-                        <div class="text-xs font-semibold text-slate-200">9:16 Blur Background Fit (Status සඳහා)</div>
-                        <div class="text-[10px] text-slate-400">Landscape වීඩියෝවල කළු තීරු වෙනුවට Blur පසුබිමක් දමයි</div>
+                        <div class="text-xs font-semibold text-slate-200">9:16 Blur Background Fit</div>
+                        <div class="text-[10px] text-slate-400">Landscape වීඩියෝවලට Blur පසුබිමක් දමයි</div>
                     </div>
                     <input type="checkbox" id="blurBg" class="w-4 h-4 accent-emerald-500 rounded">
                 </label>
             </div>
 
-            <!-- Audio & Speed Controls -->
             <div class="grid grid-cols-2 gap-2.5 mb-2.5">
                 <div class="option-card p-2.5 rounded-xl">
                     <label class="block text-[10px] text-slate-400 mb-1">Audio Control</label>
                     <select id="audioMode" class="w-full bg-slate-900 text-xs text-white rounded-lg p-1.5 border border-slate-700 outline-none">
                         <option value="normal">Normal Audio</option>
                         <option value="boost">Volume Boost (1.5x)</option>
-                        <option value="mute">Mute Audio (සද්දේ එපා)</option>
+                        <option value="mute">Mute Audio</option>
                     </select>
                 </div>
                 <div class="option-card p-2.5 rounded-xl">
@@ -111,5 +133,292 @@
                 </div>
             </div>
 
-            <!-- Watermark / Logo Upload -->
-            <div class="option-card p-3 rounded
+            <div class="option-card p-3 rounded-xl">
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-xs font-semibold text-slate-200">Watermark / Logo (අත්‍යවශ්‍ය නැත)</span>
+                    <button id="clearLogo" class="text-[10px] text-red-400 hidden">ඉවත් කරන්න</button>
+                </div>
+                <input type="file" id="logoUploader" accept="image/png,image/jpeg" class="block w-full text-xs text-slate-400
+                    file:mr-2 file:py-1 file:px-2.5
+                    file:rounded-lg file:border-0
+                    file:text-[11px] file:font-medium
+                    file:bg-slate-700 file:text-slate-200" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Instant Share Modal -->
+    <div id="autoShareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-900 border border-emerald-500/40 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
+            <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">✓</div>
+            <h3 class="text-lg font-bold text-white mb-1">Video එක ලෑස්තියි!</h3>
+            <p class="text-xs text-slate-400 mb-5">පහළ බට්න් එක එබූ සැණින් කෙලින්ම WhatsApp වෙත යොමු වේ.</p>
+            <button id="instantShareBtn" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 px-4 rounded-xl transition shadow-lg shadow-green-900/40 mb-2.5">
+                දැන්ම WhatsApp වෙත යවන්න 🚀
+            </button>
+            <button id="closeModalBtn" class="w-full bg-slate-800 text-slate-300 text-xs py-2.5 rounded-xl">
+                Preview බලන්න / Download කරන්න
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const { createFFmpeg, fetchFile } = FFmpeg;
+        const ffmpeg = createFFmpeg({ 
+            log: true,
+            corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+        });
+
+        const uploader = document.getElementById('uploader');
+        const logoUploader = document.getElementById('logoUploader');
+        const clearLogo = document.getElementById('clearLogo');
+        const convertBtn = document.getElementById('convertBtn');
+        const statusBox = document.getElementById('statusBox');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const resultBox = document.getElementById('resultBox');
+        const partsContainer = document.getElementById('partsContainer');
+        const partsCountBadge = document.getElementById('partsCountBadge');
+        const autoShareModal = document.getElementById('autoShareModal');
+        const instantShareBtn = document.getElementById('instantShareBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        let selectedFile = null;
+        let selectedLogo = null;
+        let generatedFiles = [];
+
+        uploader.addEventListener('change', (e) => {
+            selectedFile = e.target.files[0];
+            resultBox.classList.add('hidden');
+        });
+
+        logoUploader.addEventListener('change', (e) => {
+            selectedLogo = e.target.files[0];
+            if (selectedLogo) clearLogo.classList.remove('hidden');
+        });
+
+        clearLogo.addEventListener('click', () => {
+            logoUploader.value = '';
+            selectedLogo = null;
+            clearLogo.classList.add('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            autoShareModal.classList.add('hidden');
+        });
+
+        ffmpeg.setProgress(({ ratio }) => {
+            if (ratio >= 0 && ratio <= 1) {
+                const percent = Math.round(ratio * 100);
+                progressBar.style.width = `${percent}%`;
+                progressPercent.innerText = `${percent}%`;
+                statusText.innerText = `Video එක Process වෙමින් පවතී...`;
+            }
+        });
+
+        async function shareFilesToWhatsApp(filesArray) {
+            if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+                try {
+                    await navigator.share({
+                        files: filesArray,
+                        title: 'WhatsApp Optimized Video'
+                    });
+                    return true;
+                } catch (err) {
+                    return false;
+                }
+            } else {
+                alert('Direct Share පහසුකම වැඩ කරන්නේ නැත. පහළින් Download කරගන්න.');
+                return false;
+            }
+        }
+
+        instantShareBtn.addEventListener('click', async () => {
+            autoShareModal.classList.add('hidden');
+            if (generatedFiles.length > 0) {
+                await shareFilesToWhatsApp([generatedFiles[0]]);
+            }
+        });
+
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                alert('කරුණාකර මුලින්ම Video එකක් තෝරන්න!');
+                return;
+            }
+
+            if (typeof SharedArrayBuffer === 'undefined') {
+                window.location.reload();
+                return;
+            }
+
+            convertBtn.disabled = true;
+            statusBox.classList.remove('hidden');
+            resultBox.classList.add('hidden');
+            partsContainer.innerHTML = '';
+            generatedFiles = [];
+            progressBar.style.width = '0%';
+            progressPercent.innerText = '0%';
+
+            try {
+                if (!ffmpeg.isLoaded()) {
+                    statusText.innerText = 'FFmpeg Engine එක Load වෙමින් (25MB)...';
+                    await ffmpeg.load();
+                }
+
+                statusText.innerText = 'Files සූදානම් කරමින්...';
+                const inputName = 'input.mp4';
+                ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
+
+                if (selectedLogo) {
+                    ffmpeg.FS('writeFile', 'logo.png', await fetchFile(selectedLogo));
+                }
+
+                const mode = document.querySelector('input[name="mode"]:checked').value;
+                const useSharpen = document.getElementById('sharpen').checked;
+                const useSplit = document.getElementById('split30').checked;
+                const useBlurBg = document.getElementById('blurBg').checked;
+                const audioMode = document.getElementById('audioMode').value;
+                const speedVal = parseFloat(document.getElementById('speedMode').value);
+
+                const res = mode === 'status' ? 720 : 1080;
+                const targetH = mode === 'status' ? 1280 : 1920;
+                const bitrate = mode === 'status' ? '2200k' : '4500k';
+                const maxrate = mode === 'status' ? '2500k' : '5000k';
+                const bufsize = mode === 'status' ? '4400k' : '9000k';
+
+                let vChain = '';
+                if (useBlurBg) {
+                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase,crop=${res}:${targetH},boxblur=20:10[bg];[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=decrease[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2`;
+                } else {
+                    vChain = `[0:v]scale='if(gt(iw,ih),-2,${res})':'if(gt(iw,ih),${res},-2)'`;
+                }
+
+                vChain += `,fps=30`;
+
+                if (speedVal !== 1) {
+                    const pts = (1 / speedVal).toFixed(2);
+                    vChain += `,setpts=${pts}*PTS`;
+                }
+
+                if (useSharpen) {
+                    vChain += `,unsharp=5:5:0.8:5:5:0.0,eq=contrast=1.04`;
+                }
+
+                let filterComplex = '';
+                if (selectedLogo) {
+                    filterComplex = `${vChain}[base];[1:v]scale=120:-1[wm];[base][wm]overlay=W-w-20:20,format=yuv420p[vout]`;
+                } else {
+                    filterComplex = `${vChain},format=yuv420p[vout]`;
+                }
+
+                let args = ['-i', inputName];
+                if (selectedLogo) args.push('-i', 'logo.png');
+
+                args.push(
+                    '-filter_complex', filterComplex,
+                    '-map', '[vout]',
+                    '-c:v', 'libx264',
+                    '-profile:v', 'high',
+                    '-level:v', '4.0',
+                    '-preset', 'ultrafast',
+                    '-b:v', bitrate,
+                    '-maxrate', maxrate,
+                    '-bufsize', bufsize
+                );
+
+                if (audioMode === 'mute') {
+                    args.push('-an');
+                } else {
+                    args.push('-map', '0:a?');
+                    let aFilters = [];
+                    if (audioMode === 'boost') aFilters.push('volume=1.5');
+                    if (speedVal !== 1) aFilters.push(`atempo=${speedVal}`);
+                    if (aFilters.length > 0) args.push('-af', aFilters.join(','));
+                    args.push('-c:a', 'aac', '-b:a', '128k', '-ar', '44100');
+                }
+
+                if (useSplit) {
+                    args.push(
+                        '-f', 'segment',
+                        '-segment_time', '29',
+                        '-reset_timestamps', '1',
+                        '-sc_threshold', '0',
+                        '-g', '30',
+                        '-force_key_frames', 'expr:gte(t,n_forced*1)',
+                        '-y',
+                        'output_%03d.mp4'
+                    );
+                } else {
+                    args.push('-movflags', '+faststart', '-y', 'output_000.mp4');
+                }
+
+                await ffmpeg.run(...args);
+
+                statusText.innerText = 'Video කොටස් සකසමින්...';
+
+                const allFiles = ffmpeg.FS('readdir', '/');
+                const outNames = allFiles.filter(f => f.startsWith('output_') && f.endsWith('.mp4')).sort();
+
+                partsCountBadge.innerText = outNames.length > 1 ? `කොටස් ${outNames.length} යි` : `තනි වීඩියෝවකි`;
+
+                outNames.forEach((fname, idx) => {
+                    const data = ffmpeg.FS('readFile', fname);
+                    const blob = new Blob([data.buffer], { type: 'video/mp4' });
+                    const cleanName = `WA_${mode.toUpperCase()}_Part_${idx + 1}_${Date.now()}.mp4`;
+                    const fileObj = new File([blob], cleanName, { type: 'video/mp4' });
+                    generatedFiles.push(fileObj);
+
+                    const url = URL.createObjectURL(blob);
+                    const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
+
+                    const card = document.createElement('div');
+                    card.className = 'bg-slate-900 p-3.5 rounded-xl border border-slate-700';
+                    card.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-white">${outNames.length > 1 ? `Part ${idx + 1} (තත්පර 30)` : 'Optimized Video'}</span>
+                            <span class="text-[11px] text-emerald-400 font-mono">${sizeMB} MB</span>
+                        </div>
+                        <video src="${url}" controls class="w-full rounded-lg mb-3 max-h-48 bg-black"></video>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button class="share-part-btn bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition">
+                                WhatsApp යවන්න
+                            </button>
+                            <a href="${url}" download="${cleanName}" class="text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-lg border border-slate-700 transition">
+                                Download
+                            </a>
+                        </div>
+                    `;
+
+                    card.querySelector('.share-part-btn').addEventListener('click', () => {
+                        shareFilesToWhatsApp([fileObj]);
+                    });
+
+                    partsContainer.appendChild(card);
+                    ffmpeg.FS('unlink', fname);
+                });
+
+                ffmpeg.FS('unlink', inputName);
+                if (selectedLogo) ffmpeg.FS('unlink', 'logo.png');
+
+                statusBox.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+
+                if (generatedFiles.length > 0) {
+                    const autoShared = await shareFilesToWhatsApp([generatedFiles[0]]);
+                    if (!autoShared) {
+                        autoShareModal.classList.remove('hidden');
+                    }
+                }
+
+            } catch (error) {
+                console.error(error);
+                alert('Processing Error: ' + error.message);
+                statusBox.classList.add('hidden');
+            } finally {
+                convertBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
