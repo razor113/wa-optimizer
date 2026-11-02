@@ -1,4 +1,3 @@
-/*! coi-serviceworker v0.1.7 | MIT License | https://github.com/gzuidhof/coi-serviceworker */
 if (typeof window === 'undefined') {
     self.addEventListener("install", () => self.skipWaiting());
     self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
@@ -8,7 +7,7 @@ if (typeof window === 'undefined') {
             fetch(event.request).then((response) => {
                 if (response.status === 0) return response;
                 const newHeaders = new Headers(response.headers);
-                newHeaders.set("Cross-Origin-Embedder-Policy", "require-corp");
+                newHeaders.set("Cross-Origin-Embedder-Policy", "credentialless");
                 newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
                 return new Response(response.body, { status: response.status, statusText: response.statusText, headers: newHeaders });
             }).catch((e) => console.error(e))
@@ -17,7 +16,7 @@ if (typeof window === 'undefined') {
 } else {
     (async function () {
         if (window.crossOriginIsolated !== false) return;
-        const registration = await navigator.serviceWorker.register(window.document.currentScript.src).catch((e) => console.error("COOP/COEP Service Worker failed to register:", e));
+        const registration = await navigator.serviceWorker.register(window.document.currentScript.src).catch((e) => console.error(e));
         if (registration) {
             registration.addEventListener("updatefound", () => window.location.reload());
             if (registration.active && !navigator.serviceWorker.controller) window.location.reload();
