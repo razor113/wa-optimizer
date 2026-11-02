@@ -5,127 +5,242 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WA Video Optimizer Studio</title>
     <script src="coi-serviceworker.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
     <style>
-        body { background-color: #090d16; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
-        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
-        .option-card { background: rgba(30, 41, 59, 0.5); border: 1px solid rgba(51, 65, 85, 0.6); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #090d16;
+            color: #f8fafc;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 20px 14px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .card {
+            background: rgba(15, 23, 42, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            max-width: 480px;
+            width: 100%;
+            padding: 22px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            margin: auto 0;
+        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .title-wrap { display: flex; align-items: center; gap: 10px; }
+        .pill-bar { width: 10px; height: 28px; background: #10b981; border-radius: 99px; }
+        h1 { font-size: 20px; font-weight: 700; color: #fff; }
+        .badge {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            background: rgba(16, 185, 129, 0.15); color: #34d399;
+            padding: 4px 10px; border-radius: 99px; border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+        .subtitle { font-size: 12px; color: #94a3b8; margin-bottom: 18px; line-height: 1.4; }
+        .section { margin-bottom: 16px; }
+        .sec-label {
+            display: block; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: #94a3b8; margin-bottom: 8px;
+        }
+        .file-input {
+            width: 100%; font-size: 13px; color: #cbd5e1;
+            background: rgba(2, 6, 23, 0.6); border: 1px solid #334155;
+            border-radius: 12px; padding: 8px; cursor: pointer;
+        }
+        .file-input::file-selector-button {
+            background: rgba(16, 185, 129, 0.18); color: #34d399;
+            border: 0; padding: 8px 14px; border-radius: 9px;
+            font-weight: 600; font-size: 12px; margin-right: 12px; cursor: pointer;
+        }
+        .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .mode-item input { display: none; }
+        .mode-box {
+            padding: 12px 10px; border-radius: 12px;
+            border: 1px solid #334155; background: rgba(2, 6, 23, 0.45);
+            text-align: center; cursor: pointer; transition: 0.2s;
+        }
+        .mode-item input:checked + .mode-box {
+            border-color: #10b981; background: rgba(16, 185, 129, 0.12);
+        }
+        .mode-title { font-weight: 700; font-size: 14px; color: #fff; }
+        .mode-sub { font-size: 11px; color: #94a3b8; margin-top: 3px; }
+        .btn-main {
+            width: 100%; background: #059669; color: #fff;
+            font-weight: 700; font-size: 15px; padding: 14px;
+            border-radius: 12px; border: none; cursor: pointer;
+            margin-bottom: 18px; box-shadow: 0 8px 20px rgba(5, 150, 105, 0.35);
+            transition: 0.2s;
+        }
+        .btn-main:hover { background: #10b981; }
+        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+        .opt-card {
+            background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 12px; padding: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
+        }
+        .opt-title { font-size: 13px; font-weight: 600; color: #e2e8f0; }
+        .opt-desc { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+        .checkbox { width: 18px; height: 18px; accent-color: #10b981; cursor: pointer; }
+        .select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .select-card {
+            background: rgba(30, 41, 59, 0.55); border: 1px solid rgba(51, 65, 85, 0.7);
+            border-radius: 12px; padding: 10px;
+        }
+        .select-card label { display: block; font-size: 10px; color: #94a3b8; margin-bottom: 5px; }
+        .select-input {
+            width: 100%; background: #0f172a; color: #fff;
+            font-size: 12px; padding: 7px; border-radius: 8px;
+            border: 1px solid #334155; outline: none;
+        }
+        .hidden { display: none !important; }
+        .status-box {
+            background: rgba(2, 6, 23, 0.85); border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 15px; border-radius: 12px; margin-bottom: 18px;
+        }
+        .status-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+        .progress-bg { width: 100%; background: #1e293b; height: 10px; border-radius: 99px; overflow: hidden; }
+        .progress-fill { background: #10b981; height: 100%; width: 0%; transition: width 0.3s; }
+        .result-box {
+            background: rgba(2, 6, 23, 0.6); border: 1px solid rgba(16, 185, 129, 0.35);
+            padding: 15px; border-radius: 12px; margin-bottom: 18px;
+        }
+        .part-card {
+            background: #0f172a; border: 1px solid #334155;
+            padding: 12px; border-radius: 12px; margin-top: 12px;
+        }
+        .part-video { width: 100%; max-height: 200px; border-radius: 8px; background: #000; margin: 8px 0 10px; }
+        .btn-share {
+            background: #16a34a; color: #fff; font-size: 12px; font-weight: 700;
+            padding: 10px; border-radius: 8px; border: none; cursor: pointer; width: 100%;
+        }
+        .btn-dl {
+            display: block; text-align: center; text-decoration: none;
+            background: #1e293b; color: #e2e8f0; font-size: 12px; font-weight: 600;
+            padding: 10px; border-radius: 8px; border: 1px solid #334155;
+        }
+        .modal-bg {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.82);
+            display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 50;
+        }
+        .modal-card {
+            background: #0f172a; border: 1px solid rgba(16, 185, 129, 0.4);
+            border-radius: 16px; max-width: 360px; width: 100%; padding: 22px; text-align: center;
+        }
+        .privacy-note {
+            text-align: center; font-size: 11px; color: #64748b; margin-top: 14px;
+            padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.06);
+        }
     </style>
 </head>
-<body class="min-h-screen py-6 px-3 sm:px-6 flex justify-center items-start">
+<body>
 
-    <div class="glass max-w-lg w-full rounded-2xl p-5 shadow-2xl my-auto">
-        <!-- Header -->
-        <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center space-x-3">
-                <div class="w-2.5 h-7 bg-emerald-500 rounded-full"></div>
-                <h1 class="text-xl font-bold text-white tracking-wide">WA Studio Optimizer</h1>
+    <div class="card">
+        <div class="header">
+            <div class="title-wrap">
+                <div class="pill-bar"></div>
+                <h1>WA Studio Optimizer</h1>
             </div>
-            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20">Pro v2.1</span>
+            <span class="badge">Pro v2.2</span>
         </div>
-        <p class="text-xs text-slate-400 mb-4">WhatsApp Quality නොබැස Video Optimize, Split සහ Edit කරන All-in-One ටූල් එක.</p>
+        <p class="subtitle">WhatsApp Quality නොබැස Video Optimize, Split සහ Edit කරන All-in-One ටූල් එක.</p>
 
         <!-- 1. File Upload -->
-        <div class="mb-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">1. ප්‍රධාන Video එක තෝරන්න</label>
-            <input type="file" id="uploader" accept="video/*" class="block w-full text-sm text-slate-300
-                file:mr-3 file:py-2 file:px-4
-                file:rounded-xl file:border-0
-                file:text-xs file:font-semibold
-                file:bg-emerald-500/15 file:text-emerald-400
-                hover:file:bg-emerald-500/25 cursor-pointer border border-slate-700/80 rounded-xl p-1.5 bg-slate-900/50" />
+        <div class="section">
+            <label class="sec-label">1. ප්‍රධාන Video එක තෝරන්න</label>
+            <input type="file" id="uploader" accept="video/*" class="file-input" />
         </div>
 
         <!-- 2. Target Mode -->
-        <div class="mb-4">
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">2. Quality Mode එක</label>
-            <div class="grid grid-cols-2 gap-2.5">
-                <label class="cursor-pointer">
-                    <input type="radio" name="mode" value="status" class="peer sr-only" checked>
-                    <div class="p-2.5 rounded-xl border border-slate-700/80 bg-slate-900/40 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition text-center">
-                        <div class="font-bold text-sm text-white">Status Mode</div>
-                        <div class="text-[11px] text-slate-400">720p • 30fps • 2.2 Mbps</div>
+        <div class="section">
+            <label class="sec-label">2. Quality Mode එක</label>
+            <div class="mode-grid">
+                <label class="mode-item">
+                    <input type="radio" name="mode" value="status" checked>
+                    <div class="mode-box">
+                        <div class="mode-title">Status Mode</div>
+                        <div class="mode-sub">720p • 30fps • 2.2 Mbps</div>
                     </div>
                 </label>
-                <label class="cursor-pointer">
-                    <input type="radio" name="mode" value="chat" class="peer sr-only">
-                    <div class="p-2.5 rounded-xl border border-slate-700/80 bg-slate-900/40 peer-checked:border-emerald-500 peer-checked:bg-emerald-500/10 transition text-center">
-                        <div class="font-bold text-sm text-white">Chat HD Mode</div>
-                        <div class="text-[11px] text-slate-400">1080p • 30fps • 4.5 Mbps</div>
+                <label class="mode-item">
+                    <input type="radio" name="mode" value="chat">
+                    <div class="mode-box">
+                        <div class="mode-title">Chat HD Mode</div>
+                        <div class="mode-sub">1080p • 30fps • 4.5 Mbps</div>
                     </div>
                 </label>
             </div>
         </div>
 
-        <!-- START BUTTON (Moved up so it is always visible!) -->
-        <button id="convertBtn" class="w-full mb-5 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-bold py-3.5 px-4 rounded-xl transition duration-200 shadow-lg shadow-emerald-900/40 disabled:opacity-50">
+        <!-- Start Button -->
+        <button id="convertBtn" class="btn-main">
             🚀 Start Optimize & Send to WhatsApp
         </button>
 
-        <!-- Progress Bar Section -->
-        <div id="statusBox" class="mb-5 hidden bg-slate-900/90 p-4 rounded-xl border border-emerald-500/30">
-            <div class="flex justify-between text-xs text-slate-300 mb-2">
+        <!-- Progress Box (Hidden by default) -->
+        <div id="statusBox" class="status-box hidden">
+            <div class="status-row">
                 <span id="statusText">Engine එක Load වෙමින් පවතී...</span>
-                <span id="progressPercent" class="font-mono text-emerald-400">0%</span>
+                <span id="progressPercent" style="color:#34d399; font-weight:700;">0%</span>
             </div>
-            <div class="w-full bg-slate-800 rounded-full h-2.5 overflow-hidden">
-                <div id="progressBar" class="bg-emerald-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            <div class="progress-bg">
+                <div id="progressBar" class="progress-fill"></div>
             </div>
-            <p class="text-[11px] text-slate-400 mt-2 text-center">වැඩේ අවසන් වන තුරු Browser එක Close කරන්න එපා.</p>
+            <p style="font-size:11px; color:#94a3b8; margin-top:8px; text-align:center;">
+                වැඩේ අවසන් වන තුරු Browser එක Close කරන්න එපා.
+            </p>
         </div>
 
-        <!-- Output & Multi-Part Results Section -->
-        <div id="resultBox" class="mb-5 hidden border border-emerald-500/30 bg-slate-900/60 p-4 rounded-xl">
-            <div class="flex items-center justify-between mb-3">
-                <span class="text-sm font-semibold text-emerald-400">✓ සාර්ථකව Optimize වුණා!</span>
-                <span id="partsCountBadge" class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700"></span>
+        <!-- Result Box (Hidden by default) -->
+        <div id="resultBox" class="result-box hidden">
+            <div class="status-row" style="margin-bottom:4px;">
+                <span style="color:#34d399; font-weight:700; font-size:13px;">✓ සාර්ථකව Optimize වුණා!</span>
+                <span id="partsCountBadge" class="badge"></span>
             </div>
-            <div id="partsContainer" class="space-y-4"></div>
+            <div id="partsContainer"></div>
         </div>
 
-        <!-- 3. Studio Features Grid -->
+        <!-- 3. Studio Features -->
         <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">3. Studio Effects & Tools (අවශ්‍ය නම් වෙනස් කරන්න)</label>
-            
-            <div class="space-y-2.5 mb-2.5">
-                <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
-                    <div>
-                        <div class="text-xs font-semibold text-slate-200">Auto Sharpen</div>
-                        <div class="text-[10px] text-slate-400">WhatsApp බොඳවීම නැති කරයි</div>
-                    </div>
-                    <input type="checkbox" id="sharpen" checked class="w-4 h-4 accent-emerald-500 rounded">
-                </label>
+            <label class="sec-label">3. Studio Effects & Tools (අවශ්‍ය නම් වෙනස් කරන්න)</label>
 
-                <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
-                    <div>
-                        <div class="text-xs font-semibold text-emerald-300">30s Status Split</div>
-                        <div class="text-[10px] text-slate-400">දිග වීඩියෝ තත්පර 30න් 30ට කපයි</div>
-                    </div>
-                    <input type="checkbox" id="split30" class="w-4 h-4 accent-emerald-500 rounded">
-                </label>
+            <label class="opt-card">
+                <div>
+                    <div class="opt-title">Auto Sharpen</div>
+                    <div class="opt-desc">WhatsApp බොඳවීම නැති කරයි</div>
+                </div>
+                <input type="checkbox" id="sharpen" checked class="checkbox">
+            </label>
 
-                <label class="option-card p-3 rounded-xl flex items-center justify-between cursor-pointer">
-                    <div>
-                        <div class="text-xs font-semibold text-slate-200">9:16 Blur Background Fit</div>
-                        <div class="text-[10px] text-slate-400">Landscape වීඩියෝවලට Blur පසුබිමක් දමයි</div>
-                    </div>
-                    <input type="checkbox" id="blurBg" class="w-4 h-4 accent-emerald-500 rounded">
-                </label>
-            </div>
+            <label class="opt-card">
+                <div>
+                    <div class="opt-title" style="color:#6ee7b7;">30s Status Split</div>
+                    <div class="opt-desc">දිග වීඩියෝ තත්පර 30න් 30ට කපයි</div>
+                </div>
+                <input type="checkbox" id="split30" class="checkbox">
+            </label>
 
-            <div class="grid grid-cols-2 gap-2.5 mb-2.5">
-                <div class="option-card p-2.5 rounded-xl">
-                    <label class="block text-[10px] text-slate-400 mb-1">Audio Control</label>
-                    <select id="audioMode" class="w-full bg-slate-900 text-xs text-white rounded-lg p-1.5 border border-slate-700 outline-none">
+            <label class="opt-card">
+                <div>
+                    <div class="opt-title">9:16 Blur Background Fit</div>
+                    <div class="opt-desc">Landscape වීඩියෝවලට Blur පසුබිමක් දමයි</div>
+                </div>
+                <input type="checkbox" id="blurBg" class="checkbox">
+            </label>
+
+            <div class="select-grid">
+                <div class="select-card">
+                    <label>Audio Control</label>
+                    <select id="audioMode" class="select-input">
                         <option value="normal">Normal Audio</option>
                         <option value="boost">Volume Boost (1.5x)</option>
                         <option value="mute">Mute Audio</option>
                     </select>
                 </div>
-                <div class="option-card p-2.5 rounded-xl">
-                    <label class="block text-[10px] text-slate-400 mb-1">Video Speed</label>
-                    <select id="speedMode" class="w-full bg-slate-900 text-xs text-white rounded-lg p-1.5 border border-slate-700 outline-none">
+                <div class="select-card">
+                    <label>Video Speed</label>
+                    <select id="speedMode" class="select-input">
                         <option value="1">Normal (1.0x)</option>
                         <option value="1.25">Fast (1.25x)</option>
                         <option value="0.75">Slow-Mo (0.75x)</option>
@@ -133,30 +248,30 @@
                 </div>
             </div>
 
-            <div class="option-card p-3 rounded-xl">
-                <div class="flex items-center justify-between mb-1.5">
-                    <span class="text-xs font-semibold text-slate-200">Watermark / Logo (අත්‍යවශ්‍ය නැත)</span>
-                    <button id="clearLogo" class="text-[10px] text-red-400 hidden">ඉවත් කරන්න</button>
+            <div class="select-card">
+                <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                    <span class="opt-title" style="font-size:12px;">Watermark / Logo (අත්‍යවශ්‍ය නැත)</span>
+                    <button id="clearLogo" class="hidden" style="background:none; border:none; color:#f87171; font-size:11px; cursor:pointer;">ඉවත් කරන්න</button>
                 </div>
-                <input type="file" id="logoUploader" accept="image/png,image/jpeg" class="block w-full text-xs text-slate-400
-                    file:mr-2 file:py-1 file:px-2.5
-                    file:rounded-lg file:border-0
-                    file:text-[11px] file:font-medium
-                    file:bg-slate-700 file:text-slate-200" />
+                <input type="file" id="logoUploader" accept="image/png,image/jpeg" class="file-input" style="font-size:11px; padding:4px;" />
             </div>
+        </div>
+
+        <div class="privacy-note">
+            🔒 100% Private: ඔබගේ වීඩියෝ කිසිදු Server එකකට Upload නොවන අතර ඔබගේ උපාංගය තුළදීම සැකසේ.
         </div>
     </div>
 
     <!-- Instant Share Modal -->
-    <div id="autoShareModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-slate-900 border border-emerald-500/40 rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl">
-            <div class="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">✓</div>
-            <h3 class="text-lg font-bold text-white mb-1">Video එක ලෑස්තියි!</h3>
-            <p class="text-xs text-slate-400 mb-5">පහළ බට්න් එක එබූ සැණින් කෙලින්ම WhatsApp වෙත යොමු වේ.</p>
-            <button id="instantShareBtn" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3.5 px-4 rounded-xl transition shadow-lg shadow-green-900/40 mb-2.5">
+    <div id="autoShareModal" class="modal-bg hidden">
+        <div class="modal-card">
+            <div style="font-size:32px; color:#34d399; margin-bottom:8px;">✓</div>
+            <h3 style="font-size:18px; color:#fff; margin-bottom:4px;">Video එක ලෑස්තියි!</h3>
+            <p style="font-size:12px; color:#94a3b8; margin-bottom:18px;">පහළ බට්න් එක එබූ සැණින් කෙලින්ම WhatsApp වෙත යොමු වේ.</p>
+            <button id="instantShareBtn" class="btn-main" style="background:#16a34a; margin-bottom:10px;">
                 දැන්ම WhatsApp වෙත යවන්න 🚀
             </button>
-            <button id="closeModalBtn" class="w-full bg-slate-800 text-slate-300 text-xs py-2.5 rounded-xl">
+            <button id="closeModalBtn" class="btn-dl" style="width:100%; cursor:pointer;">
                 Preview බලන්න / Download කරන්න
             </button>
         </div>
@@ -229,7 +344,7 @@
                     return false;
                 }
             } else {
-                alert('Direct Share පහසුකම වැඩ කරන්නේ නැත. පහළින් Download කරගන්න.');
+                alert('Direct Share පහසුකම මෙම Browser එකේ නැත. පහළ ඇති Download බට්න් එක ඔබන්න.');
                 return false;
             }
         }
@@ -248,6 +363,7 @@
             }
 
             if (typeof SharedArrayBuffer === 'undefined') {
+                alert('කරුණාකර මෙම Link එක WhatsApp තුළින් නොව කෙලින්ම Chrome හෝ Safari Browser එකෙන් Open කරන්න (හෝ Page එක එකවරක් Reload කරන්න).');
                 window.location.reload();
                 return;
             }
@@ -373,20 +489,16 @@
                     const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
 
                     const card = document.createElement('div');
-                    card.className = 'bg-slate-900 p-3.5 rounded-xl border border-slate-700';
+                    card.className = 'part-card';
                     card.innerHTML = `
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-white">${outNames.length > 1 ? `Part ${idx + 1} (තත්පර 30)` : 'Optimized Video'}</span>
-                            <span class="text-[11px] text-emerald-400 font-mono">${sizeMB} MB</span>
+                        <div class="status-row" style="margin-bottom:4px;">
+                            <span style="font-weight:700; color:#fff;">${outNames.length > 1 ? `Part ${idx + 1} (තත්පර 30)` : 'Optimized Video'}</span>
+                            <span style="color:#34d399; font-family:monospace;">${sizeMB} MB</span>
                         </div>
-                        <video src="${url}" controls class="w-full rounded-lg mb-3 max-h-48 bg-black"></video>
-                        <div class="grid grid-cols-2 gap-2">
-                            <button class="share-part-btn bg-green-600 hover:bg-green-500 text-white text-xs font-bold py-2.5 px-3 rounded-lg transition">
-                                WhatsApp යවන්න
-                            </button>
-                            <a href="${url}" download="${cleanName}" class="text-center bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold py-2.5 px-3 rounded-lg border border-slate-700 transition">
-                                Download
-                            </a>
+                        <video src="${url}" controls class="part-video"></video>
+                        <div class="mode-grid">
+                            <button class="share-part-btn btn-share">WhatsApp යවන්න</button>
+                            <a href="${url}" download="${cleanName}" class="btn-dl">Download</a>
                         </div>
                     `;
 
