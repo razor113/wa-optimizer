@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WA 4K Master Studio v10.0</title>
-    <!-- Verified FFmpeg 0.11.6 Wrapper -->
+    <title>WA 4K Master Studio v11.0</title>
     <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -131,6 +130,7 @@
         .part-video { width: 100%; max-height: 230px; border-radius: 8px; background: #000; margin: 8px 0; }
         .btn-share { background: #16a34a; color: #fff; font-size: 12px; font-weight: 700; padding: 11px; border-radius: 8px; border: none; cursor: pointer; width: 100%; }
         .btn-dl { display: block; text-align: center; text-decoration: none; background: #1e293b; color: #fff; font-size: 12px; font-weight: 600; padding: 11px; border-radius: 8px; border: 1px solid #475569; }
+        .log-line { font-family: monospace; font-size: 10px; color: #38bdf8; margin-top: 6px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     </style>
 </head>
 <body>
@@ -141,7 +141,7 @@
                 <div class="pill-bar"></div>
                 <h1>WA 4K Master Studio</h1>
             </div>
-            <span class="badge">v10.0 Verified</span>
+            <span class="badge">v11.0 Turbo</span>
         </div>
         <p class="subtitle">4K Supersampling + WhatsApp Max Quality Ceiling • කිසිම බොඳවීමක් නොවන Pro Studio Engine එක.</p>
 
@@ -197,9 +197,7 @@
             <div class="progress-bg">
                 <div id="progressBar" class="progress-fill"></div>
             </div>
-            <p id="subStatusText" style="font-size:11px; color:#94a3b8; margin-top:8px; text-align:center;">
-                4K Lanczos Supersampling හා Anti-Blur ක්‍රියාත්මක වේ...
-            </p>
+            <div id="liveLog" class="log-line">Initializing...</div>
         </div>
 
         <!-- Result Box -->
@@ -235,9 +233,9 @@
                 <div class="field">
                     <label>Render Engine</label>
                     <select id="presetSelect" class="select-input">
-                        <option value="faster" selected>Master Crisp</option>
-                        <option value="veryfast">Balanced HQ</option>
-                        <option value="ultrafast">Fast Preview</option>
+                        <option value="veryfast" selected>Fast & Crisp (Best)</option>
+                        <option value="faster">Master Crisp</option>
+                        <option value="ultrafast">Turbo Fast</option>
                     </select>
                 </div>
             </div>
@@ -336,17 +334,16 @@
     </div>
 
     <script>
-        // 1. Clean up any old broken service workers immediately
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(regs => {
                 for (let reg of regs) reg.unregister();
             }).catch(() => {});
         }
 
-        // 2. Reliable Live Global Visitor Counter (CounterAPI.dev with instant local fallback)
+        // Visitor Counter
         (async function initCounter() {
             const countEl = document.getElementById('visitCount');
-            let fallback = parseInt(localStorage.getItem('wa_studio_v10_hits') || '1540') + 1;
+            let fallback = parseInt(localStorage.getItem('wa_studio_v10_hits') || '1541') + 1;
             localStorage.setItem('wa_studio_v10_hits', fallback);
             countEl.innerText = fallback.toLocaleString();
 
@@ -360,12 +357,9 @@
                         countEl.innerText = (1500 + parseInt(data.count)).toLocaleString();
                     }
                 }
-            } catch (err) {
-                // Keeps fallback number smoothly without blocking page
-            }
+            } catch (err) {}
         })();
 
-        // 3. UI Elements & Sliders
         const resSelect = document.getElementById('resSelect');
         const fpsSelect = document.getElementById('fpsSelect');
         const presetSelect = document.getElementById('presetSelect');
@@ -394,28 +388,28 @@
                 resSelect.value = '720';
                 fpsSelect.value = '30';
                 bitrateSlider.value = '2.0';
-                presetSelect.value = 'faster';
+                presetSelect.value = 'veryfast';
                 sharpSlider.value = '60';
                 trimEndInput.value = '29';
             } else if (type === 'status_1080p_max') {
                 resSelect.value = '1080';
                 fpsSelect.value = '30';
                 bitrateSlider.value = '2.4';
-                presetSelect.value = 'faster';
+                presetSelect.value = 'veryfast';
                 sharpSlider.value = '65';
                 trimEndInput.value = '29';
             } else if (type === 'chat_hd_60') {
                 resSelect.value = '1080';
                 fpsSelect.value = '60';
                 bitrateSlider.value = '5.0';
-                presetSelect.value = 'faster';
+                presetSelect.value = 'veryfast';
                 sharpSlider.value = '50';
                 trimEndInput.value = '0';
             } else if (type === 'native_4k') {
                 resSelect.value = '2160';
                 fpsSelect.value = '60';
                 bitrateSlider.value = '12.0';
-                presetSelect.value = 'veryfast';
+                presetSelect.value = 'ultrafast';
                 sharpSlider.value = '45';
                 trimEndInput.value = '0';
             }
@@ -431,6 +425,7 @@
         const statusText = document.getElementById('statusText');
         const progressBar = document.getElementById('progressBar');
         const progressPercent = document.getElementById('progressPercent');
+        const liveLog = document.getElementById('liveLog');
         const resultBox = document.getElementById('resultBox');
         const partsContainer = document.getElementById('partsContainer');
         const partsCountBadge = document.getElementById('partsCountBadge');
@@ -438,6 +433,7 @@
         let selectedFile = null;
         let selectedLogo = null;
         let ffmpegInstance = null;
+        let totalDurationSec = 0;
 
         uploader.addEventListener('change', (e) => {
             selectedFile = e.target.files[0];
@@ -455,7 +451,11 @@
             clearLogo.classList.add('hidden');
         });
 
-        // 4. Helper to fetch CDN files as local Blob URLs (Prevents CORS & Failed to Fetch errors on all mobile browsers!)
+        function parseTimeStr(str) {
+            const p = str.split(':');
+            return parseFloat(p[0]) * 3600 + parseFloat(p[1]) * 60 + parseFloat(p[2]);
+        }
+
         async function toBlobURL(url, mimeType) {
             const resp = await fetch(url, { mode: 'cors' });
             if (!resp.ok) throw new Error(`Network error loading ${url}`);
@@ -468,7 +468,6 @@
             if (ffmpegInstance && ffmpegInstance.isLoaded()) return ffmpegInstance;
 
             const { createFFmpeg } = FFmpeg;
-            // Verified existing Single-Thread Core v0.11.1 (Zero SharedArrayBuffer required!)
             const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.11.1/dist';
 
             statusText.innerText = 'Engine ගොනු ඩවුන්ලෝඩ් වෙමින් (1/3)...';
@@ -491,12 +490,25 @@
                 workerPath: workerURL
             });
 
-            ffmpegInstance.setProgress(({ ratio }) => {
-                if (ratio >= 0 && ratio <= 1) {
-                    const percent = Math.round(ratio * 100);
-                    progressBar.style.width = `${percent}%`;
-                    progressPercent.innerText = `${percent}%`;
-                    statusText.innerText = `4K Supersampling Render වෙමින්...`;
+            // Live Logger Parser (Accurately updates progress bar on Single-Thread core!)
+            ffmpegInstance.setLogger(({ type, message }) => {
+                if (!message) return;
+                if (message.includes('Duration:')) {
+                    const m = message.match(/Duration:\s*(\d+:\d+:\d+\.\d+)/);
+                    if (m) totalDurationSec = parseTimeStr(m[1]);
+                }
+                if (message.includes('time=')) {
+                    liveLog.innerText = message.trim();
+                    const m = message.match(/time=(\d+:\d+:\d+\.\d+)/);
+                    if (m && totalDurationSec > 0) {
+                        const currentSec = parseTimeStr(m[1]);
+                        const trimEndVal = parseFloat(trimEndInput.value) || 0;
+                        const targetDur = (!document.getElementById('split30').checked && trimEndVal > 0 && trimEndVal < totalDurationSec) ? trimEndVal : totalDurationSec;
+                        let pct = Math.min(99, Math.max(1, Math.round((currentSec / targetDur) * 100)));
+                        progressBar.style.width = `${pct}%`;
+                        progressPercent.innerText = `${pct}%`;
+                        statusText.innerText = `4K Supersampling Render වෙමින් (${pct}%)...`;
+                    }
                 }
             });
 
@@ -523,7 +535,6 @@
             document.body.removeChild(a);
         }
 
-        // 5. Main Render Handler
         convertBtn.addEventListener('click', async () => {
             if (!selectedFile) {
                 alert('කරුණාකර මුලින්ම Video එකක් තෝරන්න!');
@@ -534,24 +545,30 @@
             statusBox.classList.remove('hidden');
             resultBox.classList.add('hidden');
             partsContainer.innerHTML = '';
+            totalDurationSec = 0;
             progressBar.style.width = '5%';
             progressPercent.innerText = 'Wait...';
+            liveLog.innerText = 'Preparing memory...';
 
             try {
-                const { fetchFile } = FFmpeg;
                 const ffmpeg = await initEngine();
 
-                statusText.innerText = 'Source Video එක කියවමින්...';
-                progressBar.style.width = '5%';
-                progressPercent.innerText = '0%';
+                statusText.innerText = 'Video එක RAM එකට කියවමින්...';
+                progressBar.style.width = '8%';
+                progressPercent.innerText = 'Reading...';
 
-                const ext = (selectedFile.name.split('.').pop() || 'mp4').toLowerCase();
-                const inputName = `input.${ext}`;
-                ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
+                // Direct ArrayBuffer read (Never hangs on mobile browsers unlike fetchFile)
+                const videoBuffer = await selectedFile.arrayBuffer();
+                const inputName = 'input.mp4';
+                ffmpeg.FS('writeFile', inputName, new Uint8Array(videoBuffer));
 
                 if (selectedLogo) {
-                    ffmpeg.FS('writeFile', 'logo.png', await fetchFile(selectedLogo));
+                    const logoBuffer = await selectedLogo.arrayBuffer();
+                    ffmpeg.FS('writeFile', 'logo.png', new Uint8Array(logoBuffer));
                 }
+
+                statusText.innerText = '4K Supersampling ආරම්භ වෙමින්...';
+                liveLog.innerText = 'Analyzing video streams...';
 
                 const res = parseInt(resSelect.value);
                 const targetH = Math.round((res * 16) / 9);
@@ -574,13 +591,14 @@
                 const trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
                 const trimEnd = parseFloat(trimEndInput.value) || 0;
 
+                // Safe aspect ratio & even-dimension scaling (prevents x264 odd-width crashes)
                 let vChain = '';
                 if (fitMode === 'blur916') {
-                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase:flags=lanczos,crop=${res}:${targetH},boxblur=20:10[bg];[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=decrease:flags=lanczos+accurate_rnd+full_chroma_int[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1`;
+                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase:flags=lanczos,crop=${res}:${targetH},boxblur=20:10[bg];[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=decrease:flags=lanczos[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2,setsar=1`;
                 } else if (fitMode === 'crop916') {
-                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase:flags=lanczos+accurate_rnd+full_chroma_int,crop=${res}:${targetH},setsar=1`;
+                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase:flags=lanczos,crop=${res}:${targetH},setsar=1`;
                 } else {
-                    vChain = `[0:v]scale='if(gt(iw,ih),-2,${res})':'if(gt(iw,ih),${res},-2)':flags=lanczos+accurate_rnd+full_chroma_int,setsar=1`;
+                    vChain = `[0:v]scale='if(gt(iw,ih),-2,${res})':'if(gt(iw,ih),${res},-2)':flags=lanczos,setsar=1`;
                 }
 
                 vChain += `,fps=${fps}`;
@@ -591,7 +609,7 @@
                 }
 
                 if (parseFloat(sharpAmount) > 0) {
-                    vChain += `,unsharp=3:3:${sharpAmount}:3:3:0.15`;
+                    vChain += `,unsharp=3:3:${sharpAmount}:3:3:0.0`;
                 }
                 if (parseFloat(contrastAmount) > 1 || parseFloat(satAmount) > 1) {
                     vChain += `,eq=contrast=${contrastAmount}:saturation=${satAmount}`;
@@ -611,7 +629,8 @@
                 args.push('-i', inputName);
                 if (selectedLogo) args.push('-i', 'logo.png');
 
-                const x264Params = `deblock=-1:-1:aq-mode=2:aq-strength=1.1:psy-rd=1.0:0.15:rc-lookahead=20`;
+                // Fixed x264-params syntax (No extra colons that break FFmpeg!)
+                const x264Params = `deblock=-1,-1:aq-mode=2:aq-strength=1.1:rc-lookahead=15`;
                 const h264Level = res >= 2160 ? '5.1' : '4.1';
 
                 args.push(
@@ -626,9 +645,6 @@
                     '-maxrate', maxrate,
                     '-bufsize', bufsize,
                     '-x264-params', x264Params,
-                    '-color_primaries', 'bt709',
-                    '-color_trc', 'bt709',
-                    '-colorspace', 'bt709',
                     '-tag:v', 'avc1',
                     '-pix_fmt', 'yuv420p'
                 );
@@ -641,7 +657,7 @@
                     if (audioMode === 'boost') aFilters.push('volume=1.5');
                     if (speedVal !== 1.0) aFilters.push(`atempo=${speedVal}`);
                     if (aFilters.length > 0) args.push('-af', aFilters.join(','));
-                    args.push('-c:a', 'aac', '-b:a', '128k', '-ar', '48000', '-ac', '2');
+                    args.push('-c:a', 'aac', '-b:a', '128k', '-ar', '44100', '-ac', '2');
                 }
 
                 if (useSplit) {
@@ -661,11 +677,15 @@
 
                 await ffmpeg.run(...args);
 
+                statusText.innerText = 'Video එක සූදානම් කරමින්...';
+                progressBar.style.width = '100%';
+                progressPercent.innerText = '100%';
+
                 const allFiles = ffmpeg.FS('readdir', '/');
                 const outNames = allFiles.filter(f => f.startsWith('output_') && f.endsWith('.mp4')).sort();
 
                 if (outNames.length === 0) {
-                    throw new Error('Output file එක සෑදුණේ නැත. වෙනත් වීඩියෝවක් උත්සාහ කරන්න.');
+                    throw new Error('Render අසාර්ථක විය. කරුණාකර වෙනත් වීඩියෝවක් උත්සාහ කරන්න.');
                 }
 
                 partsCountBadge.innerText = outNames.length > 1 ? `කොටස් ${outNames.length}` : `${res}p Master`;
