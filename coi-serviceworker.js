@@ -16,10 +16,19 @@ if (typeof window === 'undefined') {
 } else {
     (async function () {
         if (window.crossOriginIsolated !== false) return;
-        const registration = await navigator.serviceWorker.register(window.document.currentScript.src).catch((e) => console.error(e));
+        const registration = await navigator.serviceWorker.register(window.document.currentScript.src).catch(() => {});
         if (registration) {
-            registration.addEventListener("updatefound", () => window.location.reload());
-            if (registration.active && !navigator.serviceWorker.controller) window.location.reload();
+            registration.addEventListener("updatefound", () => {
+                const installing = registration.installing;
+                if (installing) {
+                    installing.addEventListener("statechange", () => {
+                        if (installing.state === "activated") window.location.reload();
+                    });
+                }
+            });
+            if (registration.active && !navigator.serviceWorker.controller) {
+                window.location.reload();
+            }
         }
     })();
 }
