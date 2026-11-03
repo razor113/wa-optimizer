@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WA 4K Master Studio v6.2</title>
-    <!-- Unpkg Stable Wrapper & Core -->
-    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
+    <title>WA 4K Master Studio v7.0</title>
+    <!-- Stable Unpkg CDN Wrapper & Core v0.11.0 for 100% Universal Compatibility -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
@@ -127,12 +127,12 @@
                 <div class="pill-bar"></div>
                 <h1>WA 4K Master Studio</h1>
             </div>
-            <span class="badge">4K Engine v6.2</span>
+            <span class="badge">4K Engine v7.0</span>
         </div>
         <p class="subtitle">4K Supersampling + WhatsApp Max Quality Ceiling • කිසිම බොඳවීමක් නොවන Pro Studio Engine එක.</p>
 
         <div class="browser-badges">
-            <span class="b-tag"> Safari / iPhone</span>
+            <span class="b-tag"> Apple Safari / iOS</span>
             <span class="b-tag">🦁 Brave</span>
             <span class="b-tag">🦊 Firefox</span>
             <span class="b-tag">🌐 Chrome</span>
@@ -324,11 +324,10 @@
 
         const { createFFmpeg, fetchFile } = FFmpeg;
         
-        // Fully resolved unpkg core path to prevent any hanging or network fetch blocks
+        // Fully compatible v0.11.6 unpkg setup with proper core mapping for Apple Safari and all browsers
         const ffmpeg = createFFmpeg({ 
             log: true,
-            corePath: 'https://unpkg.com/@ffmpeg/core-st@0.10.0/dist/ffmpeg-core.js',
-            mainName: 'main'
+            corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
         });
 
         const resSelect = document.getElementById('resSelect');
@@ -460,7 +459,7 @@
 
             try {
                 if (!ffmpeg.isLoaded()) {
-                    statusText.innerText = 'FFmpeg 4K Engine එක Load වෙමින් (unpkg)...';
+                    statusText.innerText = 'FFmpeg Core එක ඩවුන්ලෝඩ් වෙමින් (පළමු වතාවට පමණයි)...';
                     await ffmpeg.load();
                 }
 
