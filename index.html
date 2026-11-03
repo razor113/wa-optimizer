@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WA 4K Master Studio v6.1</title>
-    <!-- Stable jsDelivr CDN for FFmpeg single-thread wrapper and core -->
-    <script src="https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
+    <title>WA 4K Master Studio v6.2</title>
+    <!-- Unpkg Stable Wrapper & Core -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.10.1/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
@@ -117,7 +117,6 @@
         .part-video { width: 100%; max-height: 230px; border-radius: 8px; background: #000; margin: 8px 0; }
         .btn-share { background: #16a34a; color: #fff; font-size: 12px; font-weight: 700; padding: 11px; border-radius: 8px; border: none; cursor: pointer; width: 100%; }
         .btn-dl { display: block; text-align: center; text-decoration: none; background: #1e293b; color: #fff; font-size: 12px; font-weight: 600; padding: 11px; border-radius: 8px; border: 1px solid #475569; }
-        .hidden-canvas { display: none; }
     </style>
 </head>
 <body>
@@ -128,7 +127,7 @@
                 <div class="pill-bar"></div>
                 <h1>WA 4K Master Studio</h1>
             </div>
-            <span class="badge">4K Engine v6.1</span>
+            <span class="badge">4K Engine v6.2</span>
         </div>
         <p class="subtitle">4K Supersampling + WhatsApp Max Quality Ceiling • කිසිම බොඳවීමක් නොවන Pro Studio Engine එක.</p>
 
@@ -324,9 +323,11 @@
         }
 
         const { createFFmpeg, fetchFile } = FFmpeg;
+        
+        // Fully resolved unpkg core path to prevent any hanging or network fetch blocks
         const ffmpeg = createFFmpeg({ 
             log: true,
-            corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core-st@0.10.0/dist/ffmpeg-core.js',
+            corePath: 'https://unpkg.com/@ffmpeg/core-st@0.10.0/dist/ffmpeg-core.js',
             mainName: 'main'
         });
 
@@ -459,7 +460,7 @@
 
             try {
                 if (!ffmpeg.isLoaded()) {
-                    statusText.innerText = 'FFmpeg 4K Engine එක Load වෙමින් (jsdelivr CDN)...';
+                    statusText.innerText = 'FFmpeg 4K Engine එක Load වෙමින් (unpkg)...';
                     await ffmpeg.load();
                 }
 
