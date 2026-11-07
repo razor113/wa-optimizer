@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WA Optimizer — Matte Black Edition</title>
+    <title>WA Studio — Pure Native v16</title>
     <script src="coi-serviceworker.js"></script>
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
     <style>
@@ -106,15 +106,6 @@
         .opt-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
         .opt-btn.active .opt-sub { color: var(--text-main); }
 
-        .toggle-card {
-            background: var(--matte-surface); border: 1px solid var(--matte-border);
-            border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
-        }
-        .t-title { font-size: 13px; font-weight: 700; }
-        .t-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .chk { width: 18px; height: 18px; accent-color: var(--matte-yellow); cursor: pointer; }
-
         .btn-action {
             width: 100%; background: var(--matte-yellow); color: var(--amoled);
             font-size: 14px; font-weight: 800; padding: 15px;
@@ -162,7 +153,7 @@
                 <div class="dot"></div>
                 <h1>WA STUDIO</h1>
             </div>
-            <span class="tag">PURE CLEAN v15</span>
+            <span class="tag">ZERO-FILTER v16</span>
         </div>
 
         <div class="tabs">
@@ -172,51 +163,46 @@
 
         <!-- ================= VIDEO SECTION ================= -->
         <div id="videoSection">
-            <label class="label">1. Select Video (4K / 1080p / Any Format)</label>
+            <label class="label">1. Select Video</label>
             <div class="upload-box">
                 <input type="file" id="videoInput" accept="video/*,video/mp4,video/quicktime" class="file-input" />
                 <div id="videoMeta" class="file-info hidden"></div>
             </div>
 
-            <label class="label">2. 9:16 Vertical Resolution</label>
+            <label class="label">2. Target Resolution (No Filters)</label>
             <div class="grid-3">
-                <div class="opt-btn" onclick="setVideoRes(1080, 1920, this)">
+                <div class="opt-btn active" onclick="setVideoRes(1080, 1920, this)">
                     <div class="opt-title">Full HD</div>
-                    <div class="opt-sub">1080 × 1920</div>
+                    <div class="opt-sub">1080p</div>
                 </div>
-                <div class="opt-btn active" onclick="setVideoRes(720, 1280, this)">
-                    <div class="opt-title">HD (Best)</div>
-                    <div class="opt-sub">720 × 1280</div>
+                <div class="opt-btn" onclick="setVideoRes(720, 1280, this)">
+                    <div class="opt-title">HD</div>
+                    <div class="opt-sub">720p</div>
                 </div>
                 <div class="opt-btn" onclick="setVideoRes(480, 854, this)">
                     <div class="opt-title">SD</div>
-                    <div class="opt-sub">480 × 854</div>
+                    <div class="opt-sub">480p</div>
                 </div>
             </div>
 
-            <label class="label">3. 9:16 Aspect Ratio Framing</label>
-            <div class="grid-2">
-                <div class="opt-btn active" onclick="setVideoFit('pad', this)">
-                    <div class="opt-title">9:16 Matte Pad</div>
-                    <div class="opt-sub">Full Video • No Crop</div>
+            <label class="label">3. Aspect Ratio Mode</label>
+            <div class="grid-3">
+                <div class="opt-btn active" onclick="setVideoFit('native', this)">
+                    <div class="opt-title">Original</div>
+                    <div class="opt-sub">No Pad/Crop</div>
+                </div>
+                <div class="opt-btn" onclick="setVideoFit('pad', this)">
+                    <div class="opt-title">9:16 Pad</div>
+                    <div class="opt-sub">Black Bars</div>
                 </div>
                 <div class="opt-btn" onclick="setVideoFit('crop', this)">
-                    <div class="opt-title">9:16 Full Fill</div>
-                    <div class="opt-sub">Center Vertical Crop</div>
+                    <div class="opt-title">9:16 Fill</div>
+                    <div class="opt-sub">Center Crop</div>
                 </div>
             </div>
 
-            <label class="label">4. Encoding Control</label>
-            <label class="toggle-card">
-                <div>
-                    <div class="t-title">10MB Target Lock (Max 30MB Safe)</div>
-                    <div class="t-sub">WhatsApp Re-compression එක 100%ක් නවත්වයි</div>
-                </div>
-                <input type="checkbox" id="lock10mb" checked class="chk">
-            </label>
-
             <button id="processVideoBtn" class="btn-action">
-                ⚡ OPTIMIZE CLEAN MP4 (H.264)
+                ⚡ CONVERT PURE MP4 (ZERO NOISE)
             </button>
         </div>
 
@@ -228,15 +214,15 @@
                 <div id="imageMeta" class="file-info hidden"></div>
             </div>
 
-            <label class="label">2. Framing & Output Mode</label>
+            <label class="label">2. Framing Mode</label>
             <div class="grid-2">
-                <div class="opt-btn active" onclick="setImgMode('916_pad', this)">
+                <div class="opt-btn active" onclick="setImgMode('original_hd', this)">
+                    <div class="opt-title">Original Ratio HD</div>
+                    <div class="opt-sub">Max 2048px Pure</div>
+                </div>
+                <div class="opt-btn" onclick="setImgMode('916_pad', this)">
                     <div class="opt-title">9:16 Status Fit</div>
                     <div class="opt-sub">1080×1920 Matte Black</div>
-                </div>
-                <div class="opt-btn" onclick="setImgMode('original_hd', this)">
-                    <div class="opt-title">Original Ratio HD</div>
-                    <div class="opt-sub">Max 2048px Crisp</div>
                 </div>
             </div>
 
@@ -275,24 +261,21 @@
         </div>
 
         <div class="specs-footer">
-            Pure Clean H.264 + AAC • Zero Ghosting • Full Duration Sync
+            Zero Filters • Pure CRF 18 Quality • Native Frame Timing (No Freeze)
         </div>
     </div>
 
     <script>
-        let currentTab = 'video';
-        let vWidth = 720;
-        let vHeight = 1280;
-        let vFit = 'pad';
-        let imgMode = '916_pad';
-        let videoDuration = 30;
+        let vWidth = 1080;
+        let vHeight = 1920;
+        let vFit = 'native'; // 'native', 'pad', 'crop'
+        let imgMode = 'original_hd';
         let selectedVideoFile = null;
         let selectedImageFile = null;
         let finalShareFile = null;
         let ffmpeg = null;
 
         window.switchTab = (tab, btn) => {
-            currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             document.getElementById('resultBox').classList.add('hidden');
@@ -303,7 +286,7 @@
                 document.getElementById('imageSection').classList.add('hidden');
             } else {
                 document.getElementById('videoSection').classList.add('hidden');
-                document.getElementById('imageSection').classList.add('hidden');
+                document.getElementById('imageSection').classList.remove('hidden');
             }
         };
 
@@ -333,18 +316,9 @@
                 metaEl.classList.add('hidden');
                 return;
             }
-            const sizeMB = (selectedVideoFile.size / (1024 * 1024)).toFixed(1);
+            const sizeMB = (selectedVideoFile.size / (1024 * 1024)).toFixed(2);
             metaEl.classList.remove('hidden');
-            metaEl.innerText = `Selected: ${sizeMB} MB • Checking duration...`;
-
-            const tempVid = document.createElement('video');
-            tempVid.preload = 'metadata';
-            tempVid.onloadedmetadata = () => {
-                URL.revokeObjectURL(tempVid.src);
-                videoDuration = Math.max(1, Math.round(tempVid.duration || 30));
-                metaEl.innerText = `Source: ${sizeMB} MB • Full Duration: ${videoDuration}s • Target: ~10 MB MP4`;
-            };
-            tempVid.src = URL.createObjectURL(selectedVideoFile);
+            metaEl.innerText = `Source Video: ${sizeMB} MB`;
         });
 
         document.getElementById('imageInput').addEventListener('change', (e) => {
@@ -360,7 +334,7 @@
             metaEl.innerText = `Selected Image: ${sizeMB} MB`;
         });
 
-        // --- Clean Image Processor (Zero color/shadow distortion) ---
+        // --- Pure Image Processor ---
         document.getElementById('processImageBtn').addEventListener('click', async () => {
             if (!selectedImageFile) {
                 alert('කරුණාකර මුලින්ම Image එකක් තෝරන්න!');
@@ -414,8 +388,8 @@
 
                 URL.revokeObjectURL(url);
 
-                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.95));
-                const fileName = `WA_HD_IMG_${Date.now()}.jpg`;
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.96));
+                const fileName = `WA_IMG_${Date.now()}.jpg`;
                 finalShareFile = new File([blob], fileName, { type: 'image/jpeg' });
 
                 const outUrl = URL.createObjectURL(blob);
@@ -425,7 +399,7 @@
                 outImg.classList.remove('hidden');
                 outImg.src = outUrl;
 
-                document.getElementById('outSizeBadge').innerText = `${(blob.size / 1024).toFixed(0)} KB • JPEG`;
+                document.getElementById('outSizeBadge').innerText = `${(blob.size / 1024).toFixed(0)} KB • HD JPEG`;
                 const dlBtn = document.getElementById('downloadBtn');
                 dlBtn.href = outUrl;
                 dlBtn.download = fileName;
@@ -438,7 +412,7 @@
             }
         });
 
-        // --- Clean Video Processor (No Ghosting/Shadows, Full Duration CFR Sync) ---
+        // --- Pure Zero-Filter Video Processor ---
         async function loadFFmpegEngine() {
             if (ffmpeg && ffmpeg.isLoaded()) return ffmpeg;
             const { createFFmpeg } = FFmpeg;
@@ -457,7 +431,7 @@
                     const pct = Math.min(99, Math.round(ratio * 100));
                     document.getElementById('progressBar').style.width = `${pct}%`;
                     document.getElementById('statusPct').innerText = `${pct}%`;
-                    document.getElementById('statusText').innerText = `Encoding Clean MP4 (${pct}%)...`;
+                    document.getElementById('statusText').innerText = `Encoding Pure MP4 (${pct}%)...`;
                 }
             });
 
@@ -481,70 +455,48 @@
             btn.disabled = true;
             statusBox.classList.remove('hidden');
             resultBox.classList.add('hidden');
-            progressBar.style.width = '8%';
-            statusPct.innerText = 'Wait';
+            progressBar.style.width = '5%';
+            statusPct.innerText = '0%';
 
             try {
                 const { fetchFile } = FFmpeg;
                 const engine = await loadFFmpegEngine();
 
                 document.getElementById('statusText').innerText = 'Reading Video...';
-                const inputName = 'input_vid.mp4';
-                const outputName = 'output_wa.mp4';
+                const inputName = 'input.mp4';
+                const outputName = 'output.mp4';
 
                 engine.FS('writeFile', inputName, await fetchFile(selectedVideoFile));
 
-                const lock10MB = document.getElementById('lock10mb').checked;
-                const dur = Math.max(5, videoDuration);
-                let targetKbps = 2200;
-
-                if (lock10MB) {
-                    // ~10 MB target (81920 kilobits total) across full video duration
-                    const calculated = Math.floor((81920 / dur) - 128);
-                    const maxAllowed = vWidth === 1080 ? 3500 : (vWidth === 720 ? 2400 : 1200);
-                    targetKbps = Math.max(1000, Math.min(maxAllowed, calculated));
-                } else {
-                    targetKbps = vWidth === 1080 ? 3800 : (vWidth === 720 ? 2400 : 1200);
-                }
-
-                const bitrate = `${targetKbps}k`;
-                const maxrate = `${Math.round(targetKbps * 1.2)}k`;
-                const bufsize = `${Math.round(targetKbps * 2)}k`;
-
-                // Pure 9:16 scaling WITHOUT hqdn3d or heavy unsharp (Zero shadow/halo artifacts!)
+                // ONLY clean resolution scaling. ZERO color, sharpen, fps, or denoise filters!
                 let vf = '';
-                if (vFit === 'pad') {
-                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=decrease:flags=bicubic,pad=${vWidth}:${vHeight}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,format=yuv420p`;
+                if (vFit === 'native') {
+                    // Preserves exact original aspect ratio, just caps resolution & ensures even pixel dimensions
+                    vf = `scale='if(gt(iw,ih),-2,min(iw,${vWidth}))':'if(gt(iw,ih),min(ih,${vWidth}),-2)'`;
+                } else if (vFit === 'pad') {
+                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=decrease,pad=${vWidth}:${vHeight}:(ow-iw)/2:(oh-ih)/2:black`;
                 } else {
-                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=increase:flags=bicubic,crop=${vWidth}:${vHeight},setsar=1,format=yuv420p`;
+                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=increase,crop=${vWidth}:${vHeight}`;
                 }
 
-                document.getElementById('statusText').innerText = 'Encoding Full Video...';
+                document.getElementById('statusText').innerText = 'Encoding Pure H.264...';
 
-                // -r 30 + -vsync 1 + -max_muxing_queue_size 4096 prevents the 3-second freeze on mobile VFR videos!
+                // Pure CRF 18 + veryfast + tune film:
+                // 1. No forced -r or -vsync (so timestamps never freeze!)
+                // 2. No low bitrate starving (so dark areas never get blocky noise!)
                 await engine.run(
-                    '-fflags', '+genpts',
                     '-i', inputName,
                     '-vf', vf,
-                    '-r', '30',
-                    '-vsync', '1',
                     '-c:v', 'libx264',
+                    '-preset', 'veryfast',
+                    '-tune', 'film',
+                    '-crf', '18',
+                    '-maxrate', '4500k',
+                    '-bufsize', '9000k',
                     '-profile:v', 'high',
-                    '-level:v', '4.0',
-                    '-preset', 'superfast',
-                    '-crf', '20',
-                    '-b:v', bitrate,
-                    '-maxrate', maxrate,
-                    '-bufsize', bufsize,
-                    '-g', '60',
-                    '-keyint_min', '30',
-                    '-sc_threshold', '0',
+                    '-pix_fmt', 'yuv420p',
                     '-c:a', 'aac',
-                    '-b:a', '128k',
-                    '-ar', '44100',
-                    '-ac', '2',
-                    '-af', 'aresample=async=1:min_hard_comp=0.100000:first_pts=0',
-                    '-max_muxing_queue_size', '4096',
+                    '-b:a', '160k',
                     '-movflags', '+faststart',
                     '-y',
                     outputName
@@ -553,7 +505,7 @@
                 const data = engine.FS('readFile', outputName);
                 const uint8 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
                 const blob = new Blob([uint8], { type: 'video/mp4' });
-                const fileName = `WA_${vWidth}x${vHeight}_${Date.now()}.mp4`;
+                const fileName = `WA_PURE_${vWidth}p_${Date.now()}.mp4`;
                 finalShareFile = new File([blob], fileName, { type: 'video/mp4' });
 
                 const outUrl = URL.createObjectURL(blob);
@@ -564,7 +516,7 @@
                 outVid.src = outUrl;
 
                 const finalMB = (blob.size / (1024 * 1024)).toFixed(2);
-                document.getElementById('outSizeBadge').innerText = `${finalMB} MB • ${vWidth}×${vHeight}`;
+                document.getElementById('outSizeBadge').innerText = `${finalMB} MB • Pure MP4`;
 
                 const dlBtn = document.getElementById('downloadBtn');
                 dlBtn.href = outUrl;
@@ -591,7 +543,7 @@
                 try {
                     await navigator.share({
                         files: [finalShareFile],
-                        title: 'WhatsApp HD Media'
+                        title: 'WhatsApp Pure HD'
                     });
                 } catch (e) {}
             } else {
