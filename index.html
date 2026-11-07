@@ -54,7 +54,6 @@
             padding: 4px 9px; border-radius: 6px; border: 1px solid rgba(234, 179, 8, 0.3);
         }
 
-        /* Main Tabs (Video vs Image) */
         .tabs {
             display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
             background: var(--amoled); padding: 5px; border-radius: 12px;
@@ -75,7 +74,6 @@
             color: var(--text-muted); margin-bottom: 8px;
         }
 
-        /* Upload Box */
         .upload-box {
             background: var(--amoled); border: 1px dashed var(--matte-border);
             border-radius: 14px; padding: 14px; margin-bottom: 16px;
@@ -92,7 +90,6 @@
             font-size: 11px; color: var(--matte-yellow); margin-top: 8px; font-family: monospace;
         }
 
-        /* Option Grid */
         .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
         
@@ -109,7 +106,6 @@
         .opt-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
         .opt-btn.active .opt-sub { color: var(--text-main); }
 
-        /* Toggles */
         .toggle-card {
             background: var(--matte-surface); border: 1px solid var(--matte-border);
             border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
@@ -119,7 +115,6 @@
         .t-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
         .chk { width: 18px; height: 18px; accent-color: var(--matte-yellow); cursor: pointer; }
 
-        /* Action Button */
         .btn-action {
             width: 100%; background: var(--matte-yellow); color: var(--amoled);
             font-size: 14px; font-weight: 800; padding: 15px;
@@ -129,7 +124,6 @@
         .btn-action:active { transform: scale(0.99); }
         .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        /* Progress & Results */
         .hidden { display: none !important; }
         .status-box {
             background: var(--amoled); border: 1px solid var(--matte-border);
@@ -163,16 +157,14 @@
 <body>
 
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="brand">
                 <div class="dot"></div>
                 <h1>WA STUDIO</h1>
             </div>
-            <span class="tag">AMOLED PRO</span>
+            <span class="tag">PURE CLEAN v15</span>
         </div>
 
-        <!-- Mode Selector -->
         <div class="tabs">
             <button class="tab-btn active" onclick="switchTab('video', this)">🎬 VIDEO (MP4)</button>
             <button class="tab-btn" onclick="switchTab('image', this)">🖼️ IMAGE (HD)</button>
@@ -202,7 +194,7 @@
                 </div>
             </div>
 
-            <label class="label">3. 9:16 Aspect Ratio Framing (No Distortion)</label>
+            <label class="label">3. 9:16 Aspect Ratio Framing</label>
             <div class="grid-2">
                 <div class="opt-btn active" onclick="setVideoFit('pad', this)">
                     <div class="opt-title">9:16 Matte Pad</div>
@@ -214,7 +206,7 @@
                 </div>
             </div>
 
-            <label class="label">4. Quality Protection</label>
+            <label class="label">4. Encoding Control</label>
             <label class="toggle-card">
                 <div>
                     <div class="t-title">10MB Target Lock (Max 30MB Safe)</div>
@@ -223,16 +215,8 @@
                 <input type="checkbox" id="lock10mb" checked class="chk">
             </label>
 
-            <label class="toggle-card">
-                <div>
-                    <div class="t-title">Low-Light Noise Reduction</div>
-                    <div class="t-sub">අඳුරු වීඩියෝවල කැටි ගතිය (Grain) ඉවත් කරයි</div>
-                </div>
-                <input type="checkbox" id="denoiseChk" class="chk">
-            </label>
-
             <button id="processVideoBtn" class="btn-action">
-                ⚡ OPTIMIZE VIDEO (MP4 H.264)
+                ⚡ OPTIMIZE CLEAN MP4 (H.264)
             </button>
         </div>
 
@@ -255,14 +239,6 @@
                     <div class="opt-sub">Max 2048px Crisp</div>
                 </div>
             </div>
-
-            <label class="toggle-card">
-                <div>
-                    <div class="t-title">Micro-Sharpness Boost</div>
-                    <div class="t-sub">WhatsApp Photo බොඳවීම වළක්වයි</div>
-                </div>
-                <input type="checkbox" id="imgSharpChk" checked class="chk">
-            </label>
 
             <button id="processImageBtn" class="btn-action">
                 ⚡ OPTIMIZE IMAGE (INSTANT HD)
@@ -299,24 +275,22 @@
         </div>
 
         <div class="specs-footer">
-            MP4 (H.264 + AAC) • 9:16 Vertical • Rec.709 • 10MB Sweet Spot
+            Pure Clean H.264 + AAC • Zero Ghosting • Full Duration Sync
         </div>
     </div>
 
     <script>
-        // --- State Variables ---
         let currentTab = 'video';
         let vWidth = 720;
         let vHeight = 1280;
-        let vFit = 'pad'; // 'pad' or 'crop'
+        let vFit = 'pad';
         let imgMode = '916_pad';
-        let videoDuration = 29;
+        let videoDuration = 30;
         let selectedVideoFile = null;
         let selectedImageFile = null;
         let finalShareFile = null;
         let ffmpeg = null;
 
-        // --- UI Controls ---
         window.switchTab = (tab, btn) => {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -329,7 +303,7 @@
                 document.getElementById('imageSection').classList.add('hidden');
             } else {
                 document.getElementById('videoSection').classList.add('hidden');
-                document.getElementById('imageSection').classList.remove('hidden');
+                document.getElementById('imageSection').classList.add('hidden');
             }
         };
 
@@ -351,7 +325,6 @@
             btn.classList.add('active');
         };
 
-        // --- Detect Video Duration on Selection for 10MB Smart Bitrate ---
         document.getElementById('videoInput').addEventListener('change', (e) => {
             selectedVideoFile = e.target.files[0];
             const metaEl = document.getElementById('videoMeta');
@@ -368,8 +341,8 @@
             tempVid.preload = 'metadata';
             tempVid.onloadedmetadata = () => {
                 URL.revokeObjectURL(tempVid.src);
-                videoDuration = Math.max(1, Math.min(60, Math.round(tempVid.duration || 29)));
-                metaEl.innerText = `Source: ${sizeMB} MB • Duration: ${videoDuration}s • Target: ~10 MB MP4`;
+                videoDuration = Math.max(1, Math.round(tempVid.duration || 30));
+                metaEl.innerText = `Source: ${sizeMB} MB • Full Duration: ${videoDuration}s • Target: ~10 MB MP4`;
             };
             tempVid.src = URL.createObjectURL(selectedVideoFile);
         });
@@ -387,7 +360,7 @@
             metaEl.innerText = `Selected Image: ${sizeMB} MB`;
         });
 
-        // --- Instant High-Quality Image Processor (HTML5 Canvas) ---
+        // --- Clean Image Processor (Zero color/shadow distortion) ---
         document.getElementById('processImageBtn').addEventListener('click', async () => {
             if (!selectedImageFile) {
                 alert('කරුණාකර මුලින්ම Image එකක් තෝරන්න!');
@@ -410,7 +383,6 @@
                 const ctx = canvas.getContext('2d');
 
                 if (imgMode === '916_pad') {
-                    // Exact 1080x1920 9:16 vertical status canvas with AMOLED black background
                     canvas.width = 1080;
                     canvas.height = 1920;
                     ctx.fillStyle = '#000000';
@@ -426,7 +398,6 @@
                     ctx.imageSmoothingQuality = 'high';
                     ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
                 } else {
-                    // Original Aspect Ratio capped at 2048px (WhatsApp HD Photo sweet spot)
                     const maxDim = 2048;
                     let w = img.width;
                     let h = img.height;
@@ -441,14 +412,9 @@
                     ctx.drawImage(img, 0, 0, w, h);
                 }
 
-                // Optional subtle contrast/sharpness boost via pixel convolution if checked
-                if (document.getElementById('imgSharpChk').checked) {
-                    ctx.globalCompositeOperation = 'contrast';
-                }
-
                 URL.revokeObjectURL(url);
 
-                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.94));
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.95));
                 const fileName = `WA_HD_IMG_${Date.now()}.jpg`;
                 finalShareFile = new File([blob], fileName, { type: 'image/jpeg' });
 
@@ -472,7 +438,7 @@
             }
         });
 
-        // --- Video Processor (MP4 H.264 + AAC, 9:16, ~10MB Lock) ---
+        // --- Clean Video Processor (No Ghosting/Shadows, Full Duration CFR Sync) ---
         async function loadFFmpegEngine() {
             if (ffmpeg && ffmpeg.isLoaded()) return ffmpeg;
             const { createFFmpeg } = FFmpeg;
@@ -491,7 +457,7 @@
                     const pct = Math.min(99, Math.round(ratio * 100));
                     document.getElementById('progressBar').style.width = `${pct}%`;
                     document.getElementById('statusPct').innerText = `${pct}%`;
-                    document.getElementById('statusText').innerText = `Encoding MP4 (H.264 + AAC)...`;
+                    document.getElementById('statusText').innerText = `Encoding Clean MP4 (${pct}%)...`;
                 }
             });
 
@@ -528,62 +494,57 @@
 
                 engine.FS('writeFile', inputName, await fetchFile(selectedVideoFile));
 
-                // Calculate exact bitrate to keep file around ~9.5 MB (well under 30MB limit)
                 const lock10MB = document.getElementById('lock10mb').checked;
-                const dur = Math.max(5, Math.min(60, videoDuration));
+                const dur = Math.max(5, videoDuration);
                 let targetKbps = 2200;
 
                 if (lock10MB) {
-                    // 9.5 MB = 77,824 kilobits total -> subtract 128kbps audio
-                    const calculated = Math.floor((77824 / dur) - 128);
-                    // Cap between 1000 kbps and 3200 kbps based on resolution
-                    const maxAllowed = vWidth === 1080 ? 3200 : (vWidth === 720 ? 2200 : 1200);
-                    targetKbps = Math.max(900, Math.min(maxAllowed, calculated));
+                    // ~10 MB target (81920 kilobits total) across full video duration
+                    const calculated = Math.floor((81920 / dur) - 128);
+                    const maxAllowed = vWidth === 1080 ? 3500 : (vWidth === 720 ? 2400 : 1200);
+                    targetKbps = Math.max(1000, Math.min(maxAllowed, calculated));
                 } else {
-                    targetKbps = vWidth === 1080 ? 3500 : (vWidth === 720 ? 2200 : 1200);
+                    targetKbps = vWidth === 1080 ? 3800 : (vWidth === 720 ? 2400 : 1200);
                 }
 
                 const bitrate = `${targetKbps}k`;
-                const maxrate = `${Math.round(targetKbps * 1.15)}k`;
+                const maxrate = `${Math.round(targetKbps * 1.2)}k`;
                 const bufsize = `${Math.round(targetKbps * 2)}k`;
 
-                // Build 9:16 Vertical Filter without distorting aspect ratio
+                // Pure 9:16 scaling WITHOUT hqdn3d or heavy unsharp (Zero shadow/halo artifacts!)
                 let vf = '';
                 if (vFit === 'pad') {
-                    // Fits inside 9:16 with pure AMOLED black padding
-                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=decrease,pad=${vWidth}:${vHeight}:(ow-iw)/2:(oh-ih)/2:black,setsar=1`;
+                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=decrease:flags=bicubic,pad=${vWidth}:${vHeight}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,format=yuv420p`;
                 } else {
-                    // Fills entire 9:16 vertical screen without stretching
-                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=increase,crop=${vWidth}:${vHeight},setsar=1`;
+                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=increase:flags=bicubic,crop=${vWidth}:${vHeight},setsar=1,format=yuv420p`;
                 }
 
-                vf += `,fps=30`;
+                document.getElementById('statusText').innerText = 'Encoding Full Video...';
 
-                // Low-light noise reduction filter if enabled
-                if (document.getElementById('denoiseChk').checked) {
-                    vf += `,hqdn3d=3:2:4:3`;
-                }
-
-                // Subtle sharpening to counter WhatsApp compression softness
-                vf += `,unsharp=5:5:0.6:5:5:0.0,format=yuv420p`;
-
-                document.getElementById('statusText').innerText = 'Encoding 9:16 MP4...';
-
+                // -r 30 + -vsync 1 + -max_muxing_queue_size 4096 prevents the 3-second freeze on mobile VFR videos!
                 await engine.run(
+                    '-fflags', '+genpts',
                     '-i', inputName,
-                    '-t', '59', // Keep safe within status/short limits
                     '-vf', vf,
+                    '-r', '30',
+                    '-vsync', '1',
                     '-c:v', 'libx264',
                     '-profile:v', 'high',
                     '-level:v', '4.0',
-                    '-preset', 'ultrafast',
+                    '-preset', 'superfast',
+                    '-crf', '20',
                     '-b:v', bitrate,
                     '-maxrate', maxrate,
                     '-bufsize', bufsize,
+                    '-g', '60',
+                    '-keyint_min', '30',
+                    '-sc_threshold', '0',
                     '-c:a', 'aac',
                     '-b:a', '128k',
                     '-ar', '44100',
                     '-ac', '2',
+                    '-af', 'aresample=async=1:min_hard_comp=0.100000:first_pts=0',
+                    '-max_muxing_queue_size', '4096',
                     '-movflags', '+faststart',
                     '-y',
                     outputName
@@ -624,7 +585,6 @@
             }
         });
 
-        // --- Direct Share to WhatsApp ---
         document.getElementById('shareBtn').addEventListener('click', async () => {
             if (!finalShareFile) return;
             if (navigator.canShare && navigator.canShare({ files: [finalShareFile] })) {
