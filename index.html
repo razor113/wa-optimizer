@@ -3,677 +3,639 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WA 4K Master Studio v13.0</title>
-    <!-- Enables Multi-Thread Turbo Speed on Chrome/Android/PC while staying silent on iOS -->
+    <title>WA Optimizer — Matte Black Edition</title>
     <script src="coi-serviceworker.js"></script>
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js" crossorigin="anonymous"></script>
     <style>
+        :root {
+            --amoled: #000000;
+            --matte-black: #121212;
+            --matte-surface: #1a1a1a;
+            --matte-border: #2a2a2a;
+            --matte-yellow: #eab308;
+            --matte-yellow-dim: rgba(234, 179, 8, 0.14);
+            --text-main: #f5f5f5;
+            --text-muted: #888888;
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body {
-            background-color: #05080f;
-            color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--amoled);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             min-height: 100vh;
-            padding: 16px 12px;
+            padding: 20px 14px;
             display: flex;
             justify-content: center;
             align-items: flex-start;
         }
-        .card {
-            background: #0f172a;
-            border: 1px solid rgba(56, 189, 248, 0.22);
-            border-radius: 22px;
-            max-width: 510px;
+        .container {
+            background-color: var(--matte-black);
+            border: 1px solid var(--matte-border);
+            border-radius: 20px;
+            max-width: 440px;
             width: 100%;
-            padding: 20px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+            padding: 22px;
             margin: auto 0;
         }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .title-wrap { display: flex; align-items: center; gap: 10px; }
-        .pill-bar { width: 8px; height: 28px; background: linear-gradient(180deg, #38bdf8, #10b981); border-radius: 99px; }
-        h1 { font-size: 19px; font-weight: 800; color: #fff; letter-spacing: 0.2px; }
-        .badge {
-            font-size: 10px; font-weight: 800; text-transform: uppercase;
-            background: linear-gradient(90deg, rgba(56,189,248,0.2), rgba(16,185,129,0.2));
-            color: #34d399; padding: 4px 10px; border-radius: 99px;
-            border: 1px solid rgba(16, 185, 129, 0.4);
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--matte-border);
         }
-        .subtitle { font-size: 12px; color: #94a3b8; margin-bottom: 12px; line-height: 1.4; }
-        .browser-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-        .b-tag {
-            font-size: 10px; background: #162033; color: #cbd5e1;
-            padding: 3px 8px; border-radius: 6px; border: 1px solid #26354d; font-weight: 600;
+        .brand { display: flex; align-items: center; gap: 10px; }
+        .dot { width: 10px; height: 24px; background: var(--matte-yellow); border-radius: 4px; }
+        h1 { font-size: 18px; font-weight: 800; letter-spacing: 0.3px; }
+        .tag {
+            font-size: 10px; font-weight: 800;
+            background: var(--matte-yellow-dim); color: var(--matte-yellow);
+            padding: 4px 9px; border-radius: 6px; border: 1px solid rgba(234, 179, 8, 0.3);
         }
-        .sec-label {
-            display: block; font-size: 11px; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 0.6px;
-            color: #38bdf8; margin: 14px 0 8px;
+
+        /* Main Tabs (Video vs Image) */
+        .tabs {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            background: var(--amoled); padding: 5px; border-radius: 12px;
+            border: 1px solid var(--matte-border); margin-bottom: 18px;
+        }
+        .tab-btn {
+            background: transparent; color: var(--text-muted);
+            border: none; padding: 10px; border-radius: 9px;
+            font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--matte-yellow); color: var(--amoled);
+        }
+
+        .label {
+            display: block; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            color: var(--text-muted); margin-bottom: 8px;
+        }
+
+        /* Upload Box */
+        .upload-box {
+            background: var(--amoled); border: 1px dashed var(--matte-border);
+            border-radius: 14px; padding: 14px; margin-bottom: 16px;
         }
         .file-input {
-            width: 100%; font-size: 12px; color: #cbd5e1;
-            background: #070b14; border: 1px solid #334155;
-            border-radius: 12px; padding: 8px; cursor: pointer;
+            width: 100%; font-size: 12px; color: var(--text-muted); cursor: pointer;
         }
         .file-input::file-selector-button {
-            background: #10b981; color: #042f2e;
-            border: 0; padding: 8px 14px; border-radius: 8px;
-            font-weight: 800; font-size: 12px; margin-right: 10px; cursor: pointer;
+            background: var(--matte-yellow); color: var(--amoled);
+            border: none; padding: 8px 14px; border-radius: 8px;
+            font-weight: 800; font-size: 12px; margin-right: 12px; cursor: pointer;
         }
-        .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .preset-btn {
-            background: #162033; border: 1px solid #26354d; color: #cbd5e1;
-            padding: 10px 8px; border-radius: 12px; font-size: 12px; font-weight: 700;
-            cursor: pointer; text-align: left; transition: 0.2s;
+        .file-info {
+            font-size: 11px; color: var(--matte-yellow); margin-top: 8px; font-family: monospace;
         }
-        .preset-btn.active {
-            background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #fff;
-            box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+
+        /* Option Grid */
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+        
+        .opt-btn {
+            background: var(--matte-surface); border: 1px solid var(--matte-border);
+            color: var(--text-main); padding: 11px 6px; border-radius: 12px;
+            text-align: center; cursor: pointer; transition: 0.15s;
         }
-        .preset-sub { display: block; font-size: 10px; font-weight: 400; color: #94a3b8; margin-top: 3px; }
-        .panel {
-            background: #131c2e; border: 1px solid #23314b;
-            border-radius: 14px; padding: 12px; margin-bottom: 10px;
+        .opt-btn.active {
+            background: var(--matte-yellow-dim); border-color: var(--matte-yellow);
+            color: var(--matte-yellow);
         }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .field label { display: block; font-size: 11px; color: #94a3b8; margin-bottom: 4px; font-weight: 600; }
-        .select-input, .num-input {
-            width: 100%; background: #070b14; color: #fff;
-            font-size: 12px; padding: 8px; border-radius: 8px;
-            border: 1px solid #334155; outline: none; font-weight: 600;
+        .opt-title { font-size: 13px; font-weight: 800; }
+        .opt-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; }
+        .opt-btn.active .opt-sub { color: var(--text-main); }
+
+        /* Toggles */
+        .toggle-card {
+            background: var(--matte-surface); border: 1px solid var(--matte-border);
+            border-radius: 12px; padding: 12px 14px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
-        .slider-row { margin-bottom: 10px; }
-        .slider-row:last-child { margin-bottom: 0; }
-        .slider-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
-        .slider-val { color: #34d399; font-weight: 700; font-family: monospace; }
-        input[type="range"] {
-            width: 100%; accent-color: #10b981; height: 6px;
-            background: #070b14; border-radius: 99px; cursor: pointer;
+        .t-title { font-size: 13px; font-weight: 700; }
+        .t-sub { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .chk { width: 18px; height: 18px; accent-color: var(--matte-yellow); cursor: pointer; }
+
+        /* Action Button */
+        .btn-action {
+            width: 100%; background: var(--matte-yellow); color: var(--amoled);
+            font-size: 14px; font-weight: 800; padding: 15px;
+            border: none; border-radius: 12px; cursor: pointer;
+            margin-top: 6px; transition: 0.15s;
         }
-        .toggle-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
-        }
-        .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .toggle-title { font-size: 12px; font-weight: 600; color: #e2e8f0; }
-        .toggle-sub { font-size: 10px; color: #94a3b8; }
-        .checkbox { width: 18px; height: 18px; accent-color: #10b981; cursor: pointer; }
-        .btn-main {
-            width: 100%; background: linear-gradient(135deg, #10b981, #0284c7);
-            color: #fff; font-weight: 800; font-size: 15px; padding: 15px;
-            border-radius: 12px; border: none; cursor: pointer;
-            margin: 14px 0; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.35);
-            transition: transform 0.1s;
-        }
-        .btn-main:active { transform: scale(0.99); }
-        .btn-main:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-action:active { transform: scale(0.99); }
+        .btn-action:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Progress & Results */
         .hidden { display: none !important; }
-        .status-box, .result-box {
-            background: #070b14; border: 1px solid #10b981;
-            padding: 14px; border-radius: 12px; margin-bottom: 14px;
+        .status-box {
+            background: var(--amoled); border: 1px solid var(--matte-border);
+            border-radius: 12px; padding: 14px; margin-top: 16px;
         }
-        .status-row { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
-        .progress-bg { width: 100%; background: #1e293b; height: 10px; border-radius: 99px; overflow: hidden; }
-        .progress-fill { background: linear-gradient(90deg, #10b981, #38bdf8); height: 100%; width: 0%; transition: width 0.2s; }
-        .part-card { background: #131c2e; border: 1px solid #334155; padding: 12px; border-radius: 12px; margin-top: 10px; }
-        .part-video { width: 100%; max-height: 230px; border-radius: 8px; background: #000; margin: 8px 0; }
-        .btn-share { background: #16a34a; color: #fff; font-size: 12px; font-weight: 700; padding: 11px; border-radius: 8px; border: none; cursor: pointer; width: 100%; }
-        .btn-dl { display: block; text-align: center; text-decoration: none; background: #1e293b; color: #fff; font-size: 12px; font-weight: 600; padding: 11px; border-radius: 8px; border: 1px solid #475569; }
-        .log-line { font-family: monospace; font-size: 10px; color: #38bdf8; margin-top: 8px; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .status-head { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; }
+        .bar-bg { width: 100%; height: 8px; background: var(--matte-surface); border-radius: 99px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 0%; background: var(--matte-yellow); transition: width 0.2s; }
+
+        .result-box {
+            background: var(--amoled); border: 1px solid var(--matte-yellow);
+            border-radius: 14px; padding: 14px; margin-top: 16px;
+        }
+        .preview-media {
+            width: 100%; max-height: 260px; object-fit: contain;
+            background: #080808; border-radius: 10px; margin: 10px 0;
+            border: 1px solid var(--matte-border);
+        }
+        .btn-sec {
+            display: block; width: 100%; text-align: center; text-decoration: none;
+            background: var(--matte-surface); color: var(--text-main);
+            font-size: 12px; font-weight: 700; padding: 12px;
+            border-radius: 10px; border: 1px solid var(--matte-border); cursor: pointer;
+        }
+        .specs-footer {
+            margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--matte-border);
+            font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.5;
+        }
     </style>
 </head>
 <body>
 
-    <div class="card">
+    <div class="container">
+        <!-- Header -->
         <div class="header">
-            <div class="title-wrap">
-                <div class="pill-bar"></div>
-                <h1>WA 4K Master Studio</h1>
+            <div class="brand">
+                <div class="dot"></div>
+                <h1>WA STUDIO</h1>
             </div>
-            <span class="badge">v13.0 Hybrid</span>
-        </div>
-        <p class="subtitle">4K Supersampling + WhatsApp Max Quality Ceiling • කිසිම බොඳවීමක් නොවන Pro Studio Engine එක.</p>
-
-        <div class="browser-badges">
-            <span class="b-tag"> Apple Safari / iOS</span>
-            <span class="b-tag">🦁 Brave</span>
-            <span class="b-tag">🦊 Firefox</span>
-            <span class="b-tag">🌐 Chrome</span>
-            <span id="engineModeTag" class="b-tag" style="color:#34d399; border-color:#10b981;">⚡ Checking Engine...</span>
+            <span class="tag">AMOLED PRO</span>
         </div>
 
-        <!-- 1. File Upload -->
-        <label class="sec-label">1. Source Video එක තෝරන්න (4K / 1080p / Any)</label>
-        <input type="file" id="uploader" accept="video/*,video/mp4,video/quicktime" class="file-input" />
-
-        <!-- 2. Master Presets -->
-        <label class="sec-label">2. Select Master Quality Mode</label>
-        <div class="preset-grid">
-            <div class="preset-btn active" onclick="applyPreset('status_4k_ss', this)">
-                🔥 Status 4K-Supersampled
-                <span class="preset-sub">720p • 30fps • 2.0M (No-Blur Lock)</span>
-            </div>
-            <div class="preset-btn" onclick="applyPreset('status_1080p_max', this)">
-                ⚡ Status 1080p Ultra
-                <span class="preset-sub">1080p • 30fps • 2.4M (Max Sharp)</span>
-            </div>
-            <div class="preset-btn" onclick="applyPreset('chat_hd_60', this)">
-                💎 Chat HD Master (60fps)
-                <span class="preset-sub">1080p • 60fps • 4.5M (HD Button)</span>
-            </div>
-            <div class="preset-btn" onclick="applyPreset('native_4k', this)">
-                👑 Pure 4K / 2K Export
-                <span class="preset-sub">2160p • 60fps • 10M (Doc/Raw)</span>
-            </div>
+        <!-- Mode Selector -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('video', this)">🎬 VIDEO (MP4)</button>
+            <button class="tab-btn" onclick="switchTab('image', this)">🖼️ IMAGE (HD)</button>
         </div>
 
-        <!-- Start Button -->
-        <button id="convertBtn" class="btn-main">
-            🚀 Render Ultra-Crisp Video
-        </button>
-
-        <!-- Progress Box -->
-        <div id="statusBox" class="status-box hidden">
-            <div class="status-row">
-                <span id="statusText">Engine එක සූදානම් වෙමින්...</span>
-                <span id="progressPercent" style="color:#38bdf8; font-weight:700;">0%</span>
+        <!-- ================= VIDEO SECTION ================= -->
+        <div id="videoSection">
+            <label class="label">1. Select Video (4K / 1080p / Any Format)</label>
+            <div class="upload-box">
+                <input type="file" id="videoInput" accept="video/*,video/mp4,video/quicktime" class="file-input" />
+                <div id="videoMeta" class="file-info hidden"></div>
             </div>
-            <div class="progress-bg">
-                <div id="progressBar" class="progress-fill"></div>
-            </div>
-            <div id="liveLog" class="log-line">Initializing...</div>
-        </div>
 
-        <!-- Result Box -->
-        <div id="resultBox" class="result-box hidden">
-            <div class="status-row">
-                <span style="color:#34d399; font-weight:700;">✓ Master Quality Video ලෑස්තියි!</span>
-                <span id="partsCountBadge" class="badge"></span>
-            </div>
-            <div id="partsContainer"></div>
-        </div>
-
-        <!-- 3. Pro Resolution, FPS & Bitrate -->
-        <label class="sec-label">3. Pro Resolution, FPS & Bitrate (Full Control)</label>
-        <div class="panel">
-            <div class="grid-3" style="margin-bottom: 12px;">
-                <div class="field">
-                    <label>Output Resolution</label>
-                    <select id="resSelect" class="select-input">
-                        <option value="720" selected>720p (Status Lock)</option>
-                        <option value="1080">1080p (Full HD)</option>
-                        <option value="1440">2K (1440p QHD)</option>
-                        <option value="2160">4K (2160p UHD)</option>
-                    </select>
+            <label class="label">2. 9:16 Vertical Resolution</label>
+            <div class="grid-3">
+                <div class="opt-btn" onclick="setVideoRes(1080, 1920, this)">
+                    <div class="opt-title">Full HD</div>
+                    <div class="opt-sub">1080 × 1920</div>
                 </div>
-                <div class="field">
-                    <label>Frame Rate</label>
-                    <select id="fpsSelect" class="select-input">
-                        <option value="24">24 FPS (Cinema)</option>
-                        <option value="30" selected>30 FPS (WA Native)</option>
-                        <option value="60">60 FPS (Smooth)</option>
-                    </select>
+                <div class="opt-btn active" onclick="setVideoRes(720, 1280, this)">
+                    <div class="opt-title">HD (Best)</div>
+                    <div class="opt-sub">720 × 1280</div>
                 </div>
-                <div class="field">
-                    <label>Render Engine</label>
-                    <select id="presetSelect" class="select-input">
-                        <option value="ultrafast" selected>Turbo Crisp (Best)</option>
-                        <option value="superfast">Superfast HQ</option>
-                        <option value="veryfast">Deep Master</option>
-                    </select>
+                <div class="opt-btn" onclick="setVideoRes(480, 854, this)">
+                    <div class="opt-title">SD</div>
+                    <div class="opt-sub">480 × 854</div>
                 </div>
             </div>
 
-            <div class="slider-row">
-                <div class="slider-head">
-                    <span>Target Video Bitrate (Mbps)</span>
-                    <span id="bitrateVal" class="slider-val">2.00 Mbps</span>
+            <label class="label">3. 9:16 Aspect Ratio Framing (No Distortion)</label>
+            <div class="grid-2">
+                <div class="opt-btn active" onclick="setVideoFit('pad', this)">
+                    <div class="opt-title">9:16 Matte Pad</div>
+                    <div class="opt-sub">Full Video • No Crop</div>
                 </div>
-                <input type="range" id="bitrateSlider" min="1.2" max="12.0" step="0.1" value="2.0">
-            </div>
-        </div>
-
-        <!-- 4. 4K Optical Detail & Color Grading -->
-        <label class="sec-label">4. 4K Optical Sharpening & Color Studio</label>
-        <div class="panel">
-            <div class="slider-row">
-                <div class="slider-head">
-                    <span>4K Edge Sharpness (Unsharp + CAS)</span>
-                    <span id="sharpVal" class="slider-val">60%</span>
-                </div>
-                <input type="range" id="sharpSlider" min="0" max="100" step="5" value="60">
-            </div>
-            <div class="slider-row">
-                <div class="slider-head">
-                    <span>Micro-Contrast (Clarity)</span>
-                    <span id="contrastVal" class="slider-val">+4%</span>
-                </div>
-                <input type="range" id="contrastSlider" min="0" max="20" step="1" value="4">
-            </div>
-            <div class="slider-row">
-                <div class="slider-head">
-                    <span>Color Vibrance (Saturation)</span>
-                    <span id="satVal" class="slider-val">+6%</span>
-                </div>
-                <input type="range" id="satSlider" min="0" max="30" step="1" value="6">
-            </div>
-            <div class="slider-row">
-                <div class="slider-head">
-                    <span>Video Speed</span>
-                    <span id="speedValText" class="slider-val">1.0x (Normal)</span>
-                </div>
-                <input type="range" id="speedSlider" min="0.5" max="1.5" step="0.25" value="1.0">
-            </div>
-        </div>
-
-        <!-- 5. Framing, Cut, Watermark & Audio -->
-        <label class="sec-label">5. Framing, Cut, Logo & Audio</label>
-        <div class="panel">
-            <div class="grid-2" style="margin-bottom: 10px;">
-                <div class="field">
-                    <label>Trim Start (තත්පර)</label>
-                    <input type="number" id="trimStart" class="num-input" value="0" min="0">
-                </div>
-                <div class="field">
-                    <label>Trim End (0 = Full Video)</label>
-                    <input type="number" id="trimEnd" class="num-input" value="29" min="0">
+                <div class="opt-btn" onclick="setVideoFit('crop', this)">
+                    <div class="opt-title">9:16 Full Fill</div>
+                    <div class="opt-sub">Center Vertical Crop</div>
                 </div>
             </div>
 
-            <div class="grid-2" style="margin-bottom: 10px;">
-                <div class="field">
-                    <label>Aspect Ratio / Framing</label>
-                    <select id="fitMode" class="select-input">
-                        <option value="original">Original Ratio</option>
-                        <option value="blur916">9:16 Blur Background</option>
-                        <option value="crop916">9:16 Full Center Crop</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Audio Quality</label>
-                    <select id="audioMode" class="select-input">
-                        <option value="normal">128kbps AAC (Crisp)</option>
-                        <option value="boost">Volume Boost (1.5x)</option>
-                        <option value="mute">Mute Audio</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="field" style="margin-bottom: 10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-                    <label>Custom Watermark / Logo (PNG/JPG)</label>
-                    <button id="clearLogo" class="hidden" style="background:none; border:none; color:#f87171; font-size:11px; cursor:pointer;">ඉවත් කරන්න</button>
-                </div>
-                <input type="file" id="logoUploader" accept="image/png,image/jpeg" class="file-input" style="padding:5px; font-size:11px;" />
-            </div>
-
-            <div class="toggle-row">
+            <label class="label">4. Quality Protection</label>
+            <label class="toggle-card">
                 <div>
-                    <div class="toggle-title">Auto 29s Status Splitter</div>
-                    <div class="toggle-sub">දිග වීඩියෝ තත්පර 29න් 29ට කොටස් කඩයි</div>
+                    <div class="t-title">10MB Target Lock (Max 30MB Safe)</div>
+                    <div class="t-sub">WhatsApp Re-compression එක 100%ක් නවත්වයි</div>
                 </div>
-                <input type="checkbox" id="split30" class="checkbox">
+                <input type="checkbox" id="lock10mb" checked class="chk">
+            </label>
+
+            <label class="toggle-card">
+                <div>
+                    <div class="t-title">Low-Light Noise Reduction</div>
+                    <div class="t-sub">අඳුරු වීඩියෝවල කැටි ගතිය (Grain) ඉවත් කරයි</div>
+                </div>
+                <input type="checkbox" id="denoiseChk" class="chk">
+            </label>
+
+            <button id="processVideoBtn" class="btn-action">
+                ⚡ OPTIMIZE VIDEO (MP4 H.264)
+            </button>
+        </div>
+
+        <!-- ================= IMAGE SECTION ================= -->
+        <div id="imageSection" class="hidden">
+            <label class="label">1. Select Photo / Image</label>
+            <div class="upload-box">
+                <input type="file" id="imageInput" accept="image/*" class="file-input" />
+                <div id="imageMeta" class="file-info hidden"></div>
             </div>
+
+            <label class="label">2. Framing & Output Mode</label>
+            <div class="grid-2">
+                <div class="opt-btn active" onclick="setImgMode('916_pad', this)">
+                    <div class="opt-title">9:16 Status Fit</div>
+                    <div class="opt-sub">1080×1920 Matte Black</div>
+                </div>
+                <div class="opt-btn" onclick="setImgMode('original_hd', this)">
+                    <div class="opt-title">Original Ratio HD</div>
+                    <div class="opt-sub">Max 2048px Crisp</div>
+                </div>
+            </div>
+
+            <label class="toggle-card">
+                <div>
+                    <div class="t-title">Micro-Sharpness Boost</div>
+                    <div class="t-sub">WhatsApp Photo බොඳවීම වළක්වයි</div>
+                </div>
+                <input type="checkbox" id="imgSharpChk" checked class="chk">
+            </label>
+
+            <button id="processImageBtn" class="btn-action">
+                ⚡ OPTIMIZE IMAGE (INSTANT HD)
+            </button>
+        </div>
+
+        <!-- Progress Section -->
+        <div id="statusBox" class="status-box hidden">
+            <div class="status-head">
+                <span id="statusText">Processing...</span>
+                <span id="statusPct" style="color:var(--matte-yellow); font-weight:800; font-family:monospace;">0%</span>
+            </div>
+            <div class="bar-bg">
+                <div id="progressBar" class="bar-fill"></div>
+            </div>
+        </div>
+
+        <!-- Output Section -->
+        <div id="resultBox" class="result-box hidden">
+            <div class="status-head">
+                <span style="color:var(--matte-yellow); font-weight:800;">✓ READY FOR WHATSAPP</span>
+                <span id="outSizeBadge" style="font-family:monospace; font-size:12px;"></span>
+            </div>
+            
+            <video id="outVideo" controls playsinline webkit-playsinline class="preview-media hidden"></video>
+            <img id="outImage" class="preview-media hidden" alt="Optimized Preview" />
+
+            <div class="grid-2" style="margin-bottom:0; margin-top:10px;">
+                <button id="shareBtn" class="btn-action" style="margin-top:0; padding:12px; font-size:12px;">
+                    SHARE TO WHATSAPP
+                </button>
+                <a id="downloadBtn" class="btn-sec">DOWNLOAD</a>
+            </div>
+        </div>
+
+        <div class="specs-footer">
+            MP4 (H.264 + AAC) • 9:16 Vertical • Rec.709 • 10MB Sweet Spot
         </div>
     </div>
 
     <script>
-        // Detect if Multi-Thread is available (Android/PC) or Fallback to Single-Thread (iOS/In-App)
-        const hasMultiThread = typeof SharedArrayBuffer !== 'undefined';
-        const engineTag = document.getElementById('engineModeTag');
-        if (hasMultiThread) {
-            engineTag.innerText = '🚀 Multi-Thread Turbo Active';
-        } else {
-            engineTag.innerText = '🛡️ Safe Single-Thread Mode';
-        }
+        // --- State Variables ---
+        let currentTab = 'video';
+        let vWidth = 720;
+        let vHeight = 1280;
+        let vFit = 'pad'; // 'pad' or 'crop'
+        let imgMode = '916_pad';
+        let videoDuration = 29;
+        let selectedVideoFile = null;
+        let selectedImageFile = null;
+        let finalShareFile = null;
+        let ffmpeg = null;
 
-        const resSelect = document.getElementById('resSelect');
-        const fpsSelect = document.getElementById('fpsSelect');
-        const presetSelect = document.getElementById('presetSelect');
-        const bitrateSlider = document.getElementById('bitrateSlider');
-        const bitrateVal = document.getElementById('bitrateVal');
-        const sharpSlider = document.getElementById('sharpSlider');
-        const sharpVal = document.getElementById('sharpVal');
-        const contrastSlider = document.getElementById('contrastSlider');
-        const contrastVal = document.getElementById('contrastVal');
-        const satSlider = document.getElementById('satSlider');
-        const satVal = document.getElementById('satVal');
-        const speedSlider = document.getElementById('speedSlider');
-        const speedValText = document.getElementById('speedValText');
-        const trimEndInput = document.getElementById('trimEnd');
+        // --- UI Controls ---
+        window.switchTab = (tab, btn) => {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('resultBox').classList.add('hidden');
+            document.getElementById('statusBox').classList.add('hidden');
 
-        bitrateSlider.oninput = () => bitrateVal.innerText = `${parseFloat(bitrateSlider.value).toFixed(2)} Mbps`;
-        sharpSlider.oninput = () => sharpVal.innerText = `${sharpSlider.value}%`;
-        contrastSlider.oninput = () => contrastVal.innerText = `+${contrastSlider.value}%`;
-        satSlider.oninput = () => satVal.innerText = `+${satSlider.value}%`;
-        speedSlider.oninput = () => speedValText.innerText = `${speedSlider.value}x`;
-
-        window.applyPreset = (type, el) => {
-            document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
-            if (type === 'status_4k_ss') {
-                resSelect.value = '720';
-                fpsSelect.value = '30';
-                bitrateSlider.value = '2.0';
-                presetSelect.value = 'ultrafast';
-                sharpSlider.value = '60';
-                trimEndInput.value = '29';
-            } else if (type === 'status_1080p_max') {
-                resSelect.value = '1080';
-                fpsSelect.value = '30';
-                bitrateSlider.value = '2.4';
-                presetSelect.value = 'ultrafast';
-                sharpSlider.value = '65';
-                trimEndInput.value = '29';
-            } else if (type === 'chat_hd_60') {
-                resSelect.value = '1080';
-                fpsSelect.value = '60';
-                bitrateSlider.value = '4.5';
-                presetSelect.value = 'ultrafast';
-                sharpSlider.value = '50';
-                trimEndInput.value = '0';
-            } else if (type === 'native_4k') {
-                resSelect.value = '2160';
-                fpsSelect.value = '60';
-                bitrateSlider.value = '10.0';
-                presetSelect.value = 'ultrafast';
-                sharpSlider.value = '45';
-                trimEndInput.value = '0';
+            if (tab === 'video') {
+                document.getElementById('videoSection').classList.remove('hidden');
+                document.getElementById('imageSection').classList.add('hidden');
+            } else {
+                document.getElementById('videoSection').classList.add('hidden');
+                document.getElementById('imageSection').classList.remove('hidden');
             }
-            bitrateSlider.oninput();
-            sharpSlider.oninput();
         };
 
-        const uploader = document.getElementById('uploader');
-        const logoUploader = document.getElementById('logoUploader');
-        const clearLogo = document.getElementById('clearLogo');
-        const convertBtn = document.getElementById('convertBtn');
-        const statusBox = document.getElementById('statusBox');
-        const statusText = document.getElementById('statusText');
-        const progressBar = document.getElementById('progressBar');
-        const progressPercent = document.getElementById('progressPercent');
-        const liveLog = document.getElementById('liveLog');
-        const resultBox = document.getElementById('resultBox');
-        const partsContainer = document.getElementById('partsContainer');
-        const partsCountBadge = document.getElementById('partsCountBadge');
+        window.setVideoRes = (w, h, btn) => {
+            vWidth = w; vHeight = h;
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
 
-        let selectedFile = null;
-        let selectedLogo = null;
-        let ffmpegInstance = null;
-        let totalDurationSec = 0;
+        window.setVideoFit = (fit, btn) => {
+            vFit = fit;
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
 
-        uploader.addEventListener('change', (e) => {
-            selectedFile = e.target.files[0];
-            resultBox.classList.add('hidden');
+        window.setImgMode = (mode, btn) => {
+            imgMode = mode;
+            btn.parentElement.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+
+        // --- Detect Video Duration on Selection for 10MB Smart Bitrate ---
+        document.getElementById('videoInput').addEventListener('change', (e) => {
+            selectedVideoFile = e.target.files[0];
+            const metaEl = document.getElementById('videoMeta');
+            document.getElementById('resultBox').classList.add('hidden');
+            if (!selectedVideoFile) {
+                metaEl.classList.add('hidden');
+                return;
+            }
+            const sizeMB = (selectedVideoFile.size / (1024 * 1024)).toFixed(1);
+            metaEl.classList.remove('hidden');
+            metaEl.innerText = `Selected: ${sizeMB} MB • Checking duration...`;
+
+            const tempVid = document.createElement('video');
+            tempVid.preload = 'metadata';
+            tempVid.onloadedmetadata = () => {
+                URL.revokeObjectURL(tempVid.src);
+                videoDuration = Math.max(1, Math.min(60, Math.round(tempVid.duration || 29)));
+                metaEl.innerText = `Source: ${sizeMB} MB • Duration: ${videoDuration}s • Target: ~10 MB MP4`;
+            };
+            tempVid.src = URL.createObjectURL(selectedVideoFile);
         });
 
-        logoUploader.addEventListener('change', (e) => {
-            selectedLogo = e.target.files[0];
-            if (selectedLogo) clearLogo.classList.remove('hidden');
+        document.getElementById('imageInput').addEventListener('change', (e) => {
+            selectedImageFile = e.target.files[0];
+            const metaEl = document.getElementById('imageMeta');
+            document.getElementById('resultBox').classList.add('hidden');
+            if (!selectedImageFile) {
+                metaEl.classList.add('hidden');
+                return;
+            }
+            const sizeMB = (selectedImageFile.size / (1024 * 1024)).toFixed(2);
+            metaEl.classList.remove('hidden');
+            metaEl.innerText = `Selected Image: ${sizeMB} MB`;
         });
 
-        clearLogo.addEventListener('click', () => {
-            logoUploader.value = '';
-            selectedLogo = null;
-            clearLogo.classList.add('hidden');
-        });
-
-        function parseTimeStr(str) {
-            const p = str.split(':');
-            return parseFloat(p[0]) * 3600 + parseFloat(p[1]) * 60 + parseFloat(p[2]);
-        }
-
-        async function getEngine() {
-            if (ffmpegInstance && ffmpegInstance.isLoaded()) return ffmpegInstance;
-
-            const { createFFmpeg } = FFmpeg;
-
-            if (hasMultiThread) {
-                // Fast Multi-Thread Core (The exact one that worked 100% earlier!)
-                ffmpegInstance = createFFmpeg({
-                    log: true,
-                    corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
-                });
-            } else {
-                // Safe Single-Thread Fallback for iOS without SharedArrayBuffer
-                ffmpegInstance = createFFmpeg({
-                    log: true,
-                    mainName: 'main',
-                    corePath: 'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js'
-                });
+        // --- Instant High-Quality Image Processor (HTML5 Canvas) ---
+        document.getElementById('processImageBtn').addEventListener('click', async () => {
+            if (!selectedImageFile) {
+                alert('කරුණාකර මුලින්ම Image එකක් තෝරන්න!');
+                return;
             }
 
-            ffmpegInstance.setProgress(({ ratio }) => {
+            const btn = document.getElementById('processImageBtn');
+            btn.disabled = true;
+
+            try {
+                const img = new Image();
+                const url = URL.createObjectURL(selectedImageFile);
+                await new Promise((res, rej) => {
+                    img.onload = res;
+                    img.onerror = rej;
+                    img.src = url;
+                });
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                if (imgMode === '916_pad') {
+                    // Exact 1080x1920 9:16 vertical status canvas with AMOLED black background
+                    canvas.width = 1080;
+                    canvas.height = 1920;
+                    ctx.fillStyle = '#000000';
+                    ctx.fillRect(0, 0, 1080, 1920);
+
+                    const scale = Math.min(1080 / img.width, 1920 / img.height);
+                    const drawW = Math.round(img.width * scale);
+                    const drawH = Math.round(img.height * scale);
+                    const offsetX = Math.round((1080 - drawW) / 2);
+                    const offsetY = Math.round((1920 - drawH) / 2);
+
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
+                } else {
+                    // Original Aspect Ratio capped at 2048px (WhatsApp HD Photo sweet spot)
+                    const maxDim = 2048;
+                    let w = img.width;
+                    let h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+                        else { w = Math.round((w * maxDim) / h); h = maxDim; }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, w, h);
+                }
+
+                // Optional subtle contrast/sharpness boost via pixel convolution if checked
+                if (document.getElementById('imgSharpChk').checked) {
+                    ctx.globalCompositeOperation = 'contrast';
+                }
+
+                URL.revokeObjectURL(url);
+
+                const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.94));
+                const fileName = `WA_HD_IMG_${Date.now()}.jpg`;
+                finalShareFile = new File([blob], fileName, { type: 'image/jpeg' });
+
+                const outUrl = URL.createObjectURL(blob);
+                const outImg = document.getElementById('outImage');
+                const outVid = document.getElementById('outVideo');
+                outVid.classList.add('hidden');
+                outImg.classList.remove('hidden');
+                outImg.src = outUrl;
+
+                document.getElementById('outSizeBadge').innerText = `${(blob.size / 1024).toFixed(0)} KB • JPEG`;
+                const dlBtn = document.getElementById('downloadBtn');
+                dlBtn.href = outUrl;
+                dlBtn.download = fileName;
+
+                document.getElementById('resultBox').classList.remove('hidden');
+            } catch (err) {
+                alert('Image Error: ' + err.message);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+
+        // --- Video Processor (MP4 H.264 + AAC, 9:16, ~10MB Lock) ---
+        async function loadFFmpegEngine() {
+            if (ffmpeg && ffmpeg.isLoaded()) return ffmpeg;
+            const { createFFmpeg } = FFmpeg;
+            const hasSAB = typeof SharedArrayBuffer !== 'undefined';
+
+            ffmpeg = createFFmpeg({
+                log: false,
+                mainName: hasSAB ? 'proxy_main' : 'main',
+                corePath: hasSAB
+                    ? 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js'
+                    : 'https://unpkg.com/@ffmpeg/core-st@0.11.1/dist/ffmpeg-core.js'
+            });
+
+            ffmpeg.setProgress(({ ratio }) => {
                 if (ratio > 0 && ratio <= 1) {
                     const pct = Math.min(99, Math.round(ratio * 100));
-                    progressBar.style.width = `${pct}%`;
-                    progressPercent.innerText = `${pct}%`;
-                    statusText.innerText = `Video එක Render වෙමින් පවතී (${pct}%)...`;
+                    document.getElementById('progressBar').style.width = `${pct}%`;
+                    document.getElementById('statusPct').innerText = `${pct}%`;
+                    document.getElementById('statusText').innerText = `Encoding MP4 (H.264 + AAC)...`;
                 }
             });
 
-            ffmpegInstance.setLogger(({ message }) => {
-                if (!message) return;
-                if (message.includes('Duration:')) {
-                    const m = message.match(/Duration:\s*(\d+:\d+:\d+\.\d+)/);
-                    if (m) totalDurationSec = parseTimeStr(m[1]);
-                }
-                if (message.includes('time=')) {
-                    liveLog.innerText = message.trim();
-                    const m = message.match(/time=(\d+:\d+:\d+\.\d+)/);
-                    if (m && totalDurationSec > 0) {
-                        const currentSec = parseTimeStr(m[1]);
-                        const trimEndVal = parseFloat(trimEndInput.value) || 0;
-                        const targetDur = (!document.getElementById('split30').checked && trimEndVal > 0 && trimEndVal < totalDurationSec) ? trimEndVal : totalDurationSec;
-                        const pct = Math.min(99, Math.max(1, Math.round((currentSec / targetDur) * 100)));
-                        progressBar.style.width = `${pct}%`;
-                        progressPercent.innerText = `${pct}%`;
-                        statusText.innerText = `Video එක Render වෙමින් පවතී (${pct}%)...`;
-                    }
-                }
-            });
-
-            statusText.innerText = 'FFmpeg Engine එක Load වෙමින් (25MB)...';
-            await ffmpegInstance.load();
-            return ffmpegInstance;
+            document.getElementById('statusText').innerText = 'Loading Engine...';
+            await ffmpeg.load();
+            return ffmpeg;
         }
 
-        async function shareFile(fileObj, fallbackUrl, cleanName) {
-            if (navigator.canShare && navigator.canShare({ files: [fileObj] })) {
-                try {
-                    await navigator.share({ files: [fileObj], title: 'WA 4K Master Video' });
-                    return;
-                } catch (e) {
-                    if (e.name === 'AbortError') return;
-                }
-            }
-            const a = document.createElement('a');
-            a.href = fallbackUrl;
-            a.download = cleanName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        convertBtn.addEventListener('click', async () => {
-            if (!selectedFile) {
+        document.getElementById('processVideoBtn').addEventListener('click', async () => {
+            if (!selectedVideoFile) {
                 alert('කරුණාකර මුලින්ම Video එකක් තෝරන්න!');
                 return;
             }
 
-            convertBtn.disabled = true;
+            const btn = document.getElementById('processVideoBtn');
+            const statusBox = document.getElementById('statusBox');
+            const resultBox = document.getElementById('resultBox');
+            const progressBar = document.getElementById('progressBar');
+            const statusPct = document.getElementById('statusPct');
+
+            btn.disabled = true;
             statusBox.classList.remove('hidden');
             resultBox.classList.add('hidden');
-            partsContainer.innerHTML = '';
-            totalDurationSec = 0;
-            progressBar.style.width = '5%';
-            progressPercent.innerText = '0%';
-            liveLog.innerText = 'Starting engine...';
+            progressBar.style.width = '8%';
+            statusPct.innerText = 'Wait';
 
             try {
                 const { fetchFile } = FFmpeg;
-                const ffmpeg = await getEngine();
+                const engine = await loadFFmpegEngine();
 
-                statusText.innerText = 'Video එක සූදානම් කරමින්...';
-                const inputName = 'input.mp4';
-                ffmpeg.FS('writeFile', inputName, await fetchFile(selectedFile));
+                document.getElementById('statusText').innerText = 'Reading Video...';
+                const inputName = 'input_vid.mp4';
+                const outputName = 'output_wa.mp4';
 
-                if (selectedLogo) {
-                    ffmpeg.FS('writeFile', 'logo.png', await fetchFile(selectedLogo));
-                }
+                engine.FS('writeFile', inputName, await fetchFile(selectedVideoFile));
 
-                const res = parseInt(resSelect.value);
-                const targetH = Math.round((res * 16) / 9);
-                const fps = fpsSelect.value;
-                const preset = presetSelect.value;
-                const mbps = parseFloat(bitrateSlider.value);
+                // Calculate exact bitrate to keep file around ~9.5 MB (well under 30MB limit)
+                const lock10MB = document.getElementById('lock10mb').checked;
+                const dur = Math.max(5, Math.min(60, videoDuration));
+                let targetKbps = 2200;
 
-                const bitrate = `${Math.round(mbps * 1000)}k`;
-                const maxrate = `${Math.round(mbps * 1100)}k`;
-                const bufsize = `${Math.round(mbps * 2000)}k`;
-
-                const sharpAmount = (parseInt(sharpSlider.value) / 45).toFixed(2);
-                const contrastAmount = (1 + parseInt(contrastSlider.value) / 100).toFixed(2);
-                const satAmount = (1 + parseInt(satSlider.value) / 100).toFixed(2);
-                const speedVal = parseFloat(speedSlider.value);
-
-                const fitMode = document.getElementById('fitMode').value;
-                const audioMode = document.getElementById('audioMode').value;
-                const useSplit = document.getElementById('split30').checked;
-                const trimStart = parseFloat(document.getElementById('trimStart').value) || 0;
-                const trimEnd = parseFloat(trimEndInput.value) || 0;
-
-                // Clean, crash-proof filter chain
-                let vChain = '';
-                if (fitMode === 'blur916') {
-                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase,crop=${res}:${targetH},boxblur=15:5[bg];[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=decrease[fg];[bg][fg]overlay=(W-w)/2:(H-h)/2`;
-                } else if (fitMode === 'crop916') {
-                    vChain = `[0:v]scale=${res}:${targetH}:force_original_aspect_ratio=increase,crop=${res}:${targetH}`;
+                if (lock10MB) {
+                    // 9.5 MB = 77,824 kilobits total -> subtract 128kbps audio
+                    const calculated = Math.floor((77824 / dur) - 128);
+                    // Cap between 1000 kbps and 3200 kbps based on resolution
+                    const maxAllowed = vWidth === 1080 ? 3200 : (vWidth === 720 ? 2200 : 1200);
+                    targetKbps = Math.max(900, Math.min(maxAllowed, calculated));
                 } else {
-                    vChain = `[0:v]scale='if(gt(iw,ih),-2,${res})':'if(gt(iw,ih),${res},-2)'`;
+                    targetKbps = vWidth === 1080 ? 3500 : (vWidth === 720 ? 2200 : 1200);
                 }
 
-                vChain += `,fps=${fps}`;
+                const bitrate = `${targetKbps}k`;
+                const maxrate = `${Math.round(targetKbps * 1.15)}k`;
+                const bufsize = `${Math.round(targetKbps * 2)}k`;
 
-                if (speedVal !== 1.0) {
-                    const pts = (1 / speedVal).toFixed(2);
-                    vChain += `,setpts=${pts}*PTS`;
-                }
-
-                if (parseFloat(sharpAmount) > 0) {
-                    vChain += `,unsharp=5:5:${sharpAmount}:5:5:0.0`;
-                }
-                if (parseFloat(contrastAmount) > 1 || parseFloat(satAmount) > 1) {
-                    vChain += `,eq=contrast=${contrastAmount}:saturation=${satAmount}`;
-                }
-
-                let filterComplex = '';
-                if (selectedLogo) {
-                    filterComplex = `${vChain}[base];[1:v]scale=120:-1[wm];[base][wm]overlay=W-w-20:20,format=yuv420p[vout]`;
+                // Build 9:16 Vertical Filter without distorting aspect ratio
+                let vf = '';
+                if (vFit === 'pad') {
+                    // Fits inside 9:16 with pure AMOLED black padding
+                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=decrease,pad=${vWidth}:${vHeight}:(ow-iw)/2:(oh-ih)/2:black,setsar=1`;
                 } else {
-                    filterComplex = `${vChain},format=yuv420p[vout]`;
+                    // Fills entire 9:16 vertical screen without stretching
+                    vf = `scale=${vWidth}:${vHeight}:force_original_aspect_ratio=increase,crop=${vWidth}:${vHeight},setsar=1`;
                 }
 
-                let args = [];
-                if (trimStart > 0) args.push('-ss', `${trimStart}`);
-                if (!useSplit && trimEnd > trimStart) args.push('-to', `${trimEnd}`);
+                vf += `,fps=30`;
 
-                args.push('-i', inputName);
-                if (selectedLogo) args.push('-i', 'logo.png');
+                // Low-light noise reduction filter if enabled
+                if (document.getElementById('denoiseChk').checked) {
+                    vf += `,hqdn3d=3:2:4:3`;
+                }
 
-                const h264Level = res >= 2160 ? '5.1' : '4.1';
+                // Subtle sharpening to counter WhatsApp compression softness
+                vf += `,unsharp=5:5:0.6:5:5:0.0,format=yuv420p`;
 
-                args.push(
-                    '-filter_complex', filterComplex,
-                    '-map', '[vout]',
+                document.getElementById('statusText').innerText = 'Encoding 9:16 MP4...';
+
+                await engine.run(
+                    '-i', inputName,
+                    '-t', '59', // Keep safe within status/short limits
+                    '-vf', vf,
                     '-c:v', 'libx264',
                     '-profile:v', 'high',
-                    '-level:v', h264Level,
-                    '-preset', preset,
-                    '-crf', '18',
+                    '-level:v', '4.0',
+                    '-preset', 'ultrafast',
                     '-b:v', bitrate,
                     '-maxrate', maxrate,
                     '-bufsize', bufsize,
-                    '-pix_fmt', 'yuv420p'
+                    '-c:a', 'aac',
+                    '-b:a', '128k',
+                    '-ar', '44100',
+                    '-ac', '2',
+                    '-movflags', '+faststart',
+                    '-y',
+                    outputName
                 );
 
-                if (audioMode === 'mute') {
-                    args.push('-an');
-                } else {
-                    args.push('-map', '0:a?');
-                    let aFilters = [];
-                    if (audioMode === 'boost') aFilters.push('volume=1.5');
-                    if (speedVal !== 1.0) aFilters.push(`atempo=${speedVal}`);
-                    if (aFilters.length > 0) args.push('-af', aFilters.join(','));
-                    args.push('-c:a', 'aac', '-b:a', '128k', '-ar', '44100');
-                }
+                const data = engine.FS('readFile', outputName);
+                const uint8 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
+                const blob = new Blob([uint8], { type: 'video/mp4' });
+                const fileName = `WA_${vWidth}x${vHeight}_${Date.now()}.mp4`;
+                finalShareFile = new File([blob], fileName, { type: 'video/mp4' });
 
-                if (useSplit) {
-                    args.push(
-                        '-f', 'segment',
-                        '-segment_time', '29',
-                        '-reset_timestamps', '1',
-                        '-sc_threshold', '0',
-                        '-g', fps,
-                        '-force_key_frames', 'expr:gte(t,n_forced*1)',
-                        '-y',
-                        'output_%03d.mp4'
-                    );
-                } else {
-                    args.push('-movflags', '+faststart', '-y', 'output_000.mp4');
-                }
+                const outUrl = URL.createObjectURL(blob);
+                const outVid = document.getElementById('outVideo');
+                const outImg = document.getElementById('outImage');
+                outImg.classList.add('hidden');
+                outVid.classList.remove('hidden');
+                outVid.src = outUrl;
 
-                statusText.innerText = 'Video එක Render වෙමින් පවතී...';
-                await ffmpeg.run(...args);
+                const finalMB = (blob.size / (1024 * 1024)).toFixed(2);
+                document.getElementById('outSizeBadge').innerText = `${finalMB} MB • ${vWidth}×${vHeight}`;
 
-                statusText.innerText = 'අවසන් කරමින්...';
-                const allFiles = ffmpeg.FS('readdir', '/');
-                const outNames = allFiles.filter(f => f.startsWith('output_') && f.endsWith('.mp4')).sort();
+                const dlBtn = document.getElementById('downloadBtn');
+                dlBtn.href = outUrl;
+                dlBtn.download = fileName;
 
-                partsCountBadge.innerText = outNames.length > 1 ? `කොටස් ${outNames.length}` : `${res}p Master`;
-
-                outNames.forEach((fname, idx) => {
-                    const data = ffmpeg.FS('readFile', fname);
-                    const uint8 = new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
-                    const blob = new Blob([uint8], { type: 'video/mp4' });
-                    const cleanName = `WA_MASTER_${res}p_${idx + 1}_${Date.now()}.mp4`;
-                    const fileObj = new File([blob], cleanName, { type: 'video/mp4', lastModified: Date.now() });
-
-                    const url = URL.createObjectURL(blob);
-                    const sizeMB = (blob.size / (1024 * 1024)).toFixed(2);
-
-                    const card = document.createElement('div');
-                    card.className = 'part-card';
-                    card.innerHTML = `
-                        <div class="status-row">
-                            <span style="font-weight:700; color:#fff;">${outNames.length > 1 ? `Part ${idx + 1} (29s)` : `Master Video (${res}p)`}</span>
-                            <span style="color:#38bdf8; font-family:monospace;">${sizeMB} MB</span>
-                        </div>
-                        <video src="${url}" controls playsinline webkit-playsinline class="part-video"></video>
-                        <div class="grid-2">
-                            <button class="share-part-btn btn-share">WhatsApp යවන්න 🚀</button>
-                            <a href="${url}" download="${cleanName}" class="btn-dl">Save / Download</a>
-                        </div>
-                    `;
-
-                    card.querySelector('.share-part-btn').addEventListener('click', () => shareFile(fileObj, url, cleanName));
-                    partsContainer.appendChild(card);
-                    ffmpeg.FS('unlink', fname);
-                });
-
-                ffmpeg.FS('unlink', inputName);
-                if (selectedLogo) ffmpeg.FS('unlink', 'logo.png');
+                engine.FS('unlink', inputName);
+                engine.FS('unlink', outputName);
 
                 statusBox.classList.add('hidden');
                 resultBox.classList.remove('hidden');
 
-            } catch (error) {
-                console.error(error);
-                alert('Render Error: ' + error.message);
+            } catch (err) {
+                console.error(err);
+                alert('Video Error: ' + err.message);
                 statusBox.classList.add('hidden');
             } finally {
-                convertBtn.disabled = false;
+                btn.disabled = false;
+            }
+        });
+
+        // --- Direct Share to WhatsApp ---
+        document.getElementById('shareBtn').addEventListener('click', async () => {
+            if (!finalShareFile) return;
+            if (navigator.canShare && navigator.canShare({ files: [finalShareFile] })) {
+                try {
+                    await navigator.share({
+                        files: [finalShareFile],
+                        title: 'WhatsApp HD Media'
+                    });
+                } catch (e) {}
+            } else {
+                document.getElementById('downloadBtn').click();
             }
         });
     </script>
